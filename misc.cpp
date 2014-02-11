@@ -1,5 +1,4 @@
-#ifndef _BPJ_SAND2_CONTEXT_H
-#define _BPJ_SAND2_CONTEXT_H
+/* This is rescued code*/
 
 #include "randomizer.h"
 #include <string>
@@ -84,5 +83,3 @@ public:
       printf("%d: %s\n", elements[i].id, elements[i].name.c_str());
   }
 };
-
-#endif

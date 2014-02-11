@@ -3,10 +3,11 @@
 %{
 #include "s2struct.h"
 #include <stdio.h>
+#include <stdlib.h>
 %}
 
 %union {
-  struct StringList* strlist;
+  StringList* strlist;
   char* str;
   float f;
 }
@@ -19,10 +20,11 @@
 
 %%
 
-spec: 	element_list element_defs
+spec: 		element_list {destroyStringList($1);}
+	|	element_list element_defs
 
-element_list:	IDENT
-	|	IDENT COMMA element_list
+element_list:	IDENT {$$ = cons($1, NULL);}
+	|	IDENT COMMA element_list {$$ = cons($1, $3);}
 
 element_defs:	element_def
 	|	element_def element_defs
@@ -43,7 +45,18 @@ ptable: 	prob_entry
 prob_entry:	IDENT NUMBER
 
 %%
-void yyerror(const char* str) {
+int yyerror(const char* str) {
   printf("Error: %s\n", str);
   exit(1);
+  return 0;
+}
+
+int main(int argc, char** argv) {
+  extern FILE* yyin;
+  if (argc < 2) return 0;
+  yyin = fopen(argv[1], "r");
+  
+  yyparse();
+  
+  return 0;
 }
