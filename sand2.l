@@ -6,7 +6,7 @@
 # include "sand2.tab.h"
 
 int yyerror(const char*);
-
+ 
 %}
 
 %%
@@ -17,12 +17,13 @@ int yyerror(const char*);
   /* Basic tokens */
 "element" return ELEMENT;
 "density" return DENSITY;
-"fixed" return FIXED;
 "color" return COLOR;
 "react" return REACT;
+"decay" return DECAY;
 "(" return LPAREN;
 ")" return RPAREN;
 "," return COMMA;
+":" return COLON;
 [a-zA-Z_][0-9a-zA-Z_]* {yylval.str = strdup(yytext); return IDENT;}
 [0-9\-\+][0-9]*[0-9\.][0-9]* {sscanf(yytext, "%f", &yylval.f); return NUMBER;}
 
