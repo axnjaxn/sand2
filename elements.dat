@@ -1,18 +1,135 @@
-//Air,
-//Wall,
-Sand,
-Water,
-Oil,
-Salt,
-Saltwater,
-Plant,
-Wood,
-Fire,
-Steam,
-Torch,
-Spout,
-Napalm,
-CementPowder,
-CementMix,
-Radiation,
-Fallout
+//elements.dat
+//An example of how to define elements for Sand 2.0 by Brian Jackson
+
+//First, there's a comma-separated list of element names
+//This is used internally to compute the size of the element table
+//and assign each name to an id number
+
+//Note that Air and Wall are always included by default, and don't need to be added
+//Air, Wall,
+Sand, Water, Oil, Salt, Saltwater, Plant, Wood, Fire, Steam,
+Torch, Spout, Napalm, CementPowder, CementMix, Radiation, Fallout
+
+//Next, there's the element properties
+//Each element starts with the keyword "element" and a (usually) capitalized name
+//Each element can have the following properties:
+//color, density, react, decay
+
+element Air
+	color 0.0, 0.0, 0.0 //Colors must be specified r, g, b in the range 0.0 - 1.0
+	//If density isn't specified, the element will be unaffected by gravity
+	react Torch: fire 1.0
+	react Spout: water 1.0
+	react Radiation: radiation 1.0 //This gives a 100% chance that air touching radiation will become radiation
+
+element Wall
+	color 0.75, 0.75, 0.75
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+
+element Sand 
+	color 1.0, 0.75, 0.25
+	density 2.0 //Density is arbitrary, but the denser elements seek the bottom
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+
+element Water
+	color 0.0, 0.0, 1.0
+	density 1.0
+	react Salt: Saltwater 0.1
+	react Plant: Plant 1.0
+	react Fire: Steam 0.8
+	react Napalm: Fire 1.0
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+
+element Oil
+	color 0.75, 0.25, 0.25
+	density 0.75
+	react Fire: Fire 1.0
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+
+element Salt
+	color 1.0, 1.0, 1.0
+	density 1.5
+	react Water: Saltwater 0.1
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+
+element SaltWater
+	color 0.25, 0.25, 0.75
+	density 1.25
+	react Fire: Salt 0.5, Water 0.5 //This is an example of multiple reactions - each one has a probability of 50%
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+	decay Salt 0.001, Water 0.001 //If the element decays (changes without needing to touch anything) it looks like this
+
+element Plant
+	color 0.0, 1.0, 0.0
+	react Salt: Wood 0.05
+	react Wood: Wood 0.01
+	react Fire: Fire 1.0
+	react Napalm: Fire 1.0
+	
+element Wood
+	color 0.75, 0.75, 0.0
+	react Fire: Fire 1.0
+	react Radiation: Fallout 1.0
+	react Fallout: Fallout 1.0
+
+element Fire
+	color 1.0, 0.0, 0.0
+	density -1.0
+	react Water: Steam 0.8
+	react Saltwater: Steam 0.4, Salt 0.4
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+	decay Air 1.0
+
+element Steam
+	color 0.5, 0.5, 1.0
+	density -0.5
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0	
+	decay Water 0.005
+
+element Torch
+	color 0.75, 0.0, 0.0
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+
+element Spout
+	color 0.0, 0.5, 0.0
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+
+element Napalm
+	color 0.75, 0.5, 0.0
+	density 0.5
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+
+element CementPowder
+	color 0.5, 1.0, 0.25
+	density 1.75
+	react Water: CementMix 0.1
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+
+element CementMix
+	color 0.5, 1.0, 0.25
+	density 1.8
+	react Air: Wall 0.02
+	react Wall: Wall 0.01
+	decay Wall 0.002
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+
+element Radiation
+	color 1.0, 0.0, 1.0
+	decay Fallout 0.5
+	
+element Fallout
+	color 0.0, 1.0, 1.0
+	decay Air 0.015
