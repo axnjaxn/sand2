@@ -1,9 +1,13 @@
-#include "randomizer.h"
 #include "elements.h"
+#include <cstdlib>
 #include <exception>
 
-ElementID ProbList::random() {
-  float f = Randomizer::uniform();
+inline float uniform() {return (rand() & 0x7FFF) / 32768.0;}
+
+ElementID ProbList::random() const {
+  if (entries.empty()) return none;
+  
+  float f = uniform();
   for (int i = 0; i < entries.size(); i++) {
     if (f < entries[i].p) return entries[i].id;
     f -= entries[i].p;
@@ -82,4 +86,9 @@ ElementTable::ElementTable(Sand2Spec* spec) {
       elements[i].decay.add(ProbEntry((ElementID)j, dnode->p));
     }
   }
+}
+
+int ElementTable::getIndex(const std::string& name) {
+  //uf
+  return 0;
 }

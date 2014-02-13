@@ -1,4 +1,4 @@
-CFLAGS = -g
+CFLAGS = -g -O2
 LFLAGS = -g `sdl2-config --libs` -lfl
 
 all: sand2
@@ -9,7 +9,7 @@ sand2:	sand2.lex.o sand2.tab.o s2struct.o elements.o world.o pixelrenderer.o mai
 main.o: main.cpp s2struct.h sand2.tab.h elements.h
 	$(CXX) -c $< $(CFLAGS)
 
-elements.o: elements.cpp elements.h
+elements.o: elements.cpp elements.h s2struct.h
 	$(CXX) -c $< $(CFLAGS)
 
 world.o: world.cpp world.h elements.h

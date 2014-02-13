@@ -1,9 +1,16 @@
 #include "world.h"
 #include <cstring>
+#include <cstdlib>
 
 void World::react(int r0, int c0, int r1, int c1) {
-  ElementID result = table->elements[at(r0, c0)].reactions[at(r1, c1)].random();
+  ElementID result = elementAt(r0, c0).reactions[at(r1, c1)].random();
   if (result != ProbList::none) set(r0, c0, result);
+}
+
+void World::swap(int r0, int c0, int r1, int c1) {
+  ElementID t = at(r0, c0);
+  set(r0, c0, at(r1, c1));
+  set(r1, c1, t);  
 }
 
 World::World(ElementTable* table, int nr, int nc) {
@@ -60,8 +67,13 @@ ElementID World::at(int r, int c) const {
 }
 
 void World::set(int r, int c, ElementID id) {
+  if (r < 0 || r >= nr || c < 0 || c >= nc) return;
   buffer[r * nc + c] = id;
   changes[r * nc + c] = 1;
+}
+
+const Element& World::elementAt(int r, int c) const {
+  return table->elements[at(r, c)];
 }
 
 void World::flipBuffer() {
@@ -89,11 +101,50 @@ void World::applyReaction() {
       if (changed(r, c)) continue;
       react(r, c, r - 1, c + 1);
     }
+
   flipBuffer();
 }
 
-void World::applyDecay() { }
+void World::applyDecay() {
+  ElementID result;
+  for (int r = 0; r < nr; r++)
+    for (int c = 0; c < nc; c++) {
+      if (changed(r, c)) continue;
+      result = elementAt(r, c).decay.random();
+      if (result != ProbList::none) set(r, c, result);
+    }
 
-void World::applyShift() { }
+  flipBuffer();
+}
 
-void World::iterate() { }
+inline float uniform() {return (rand() & 0x7FFF) / 32768.0;}
+
+void World::applyShift() {
+  const float pshift = 0.25;
+  
+  for (int r = 0; r < nr - 1; r++)
+    for (int c = 0; c < nc; c++) {
+      if (changed(r, c) || elementAt(r, c).fixed || changed(r + 1, c) || elementAt(r + 1, c).fixed) 
+	continue;
+      else if (elementAt(r, c).density >= elementAt(r + 1, c).density)
+	swap(r, c, r + 1, c);
+    }
+
+  flipBuffer();
+
+  for (int r = 0; r < nr; r++)
+    for (int c = 0; c < nc - 1; c++) {
+      if (changed(r, c) || elementAt(r, c).fixed || changed(r, c + 1) || elementAt(r, c + 1).fixed) 
+	continue;
+      else if (uniform() < pshift)
+	swap(r, c, r, c + 1);
+    }
+
+  flipBuffer();
+}
+
+void World::iterate() {
+  applyReaction();
+  applyDecay();
+  applyShift();
+}

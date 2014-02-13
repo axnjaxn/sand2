@@ -6,6 +6,7 @@
 class World {
 protected:
   void react(int r0, int c0, int r1, int c1);
+  void swap(int r0, int c0, int r1, int c1); 
 
 public:
   ElementTable* table;
@@ -23,6 +24,8 @@ public:
   bool changed(int r, int c) const;
   ElementID at(int r, int c) const;
   void set(int r, int c, ElementID id);
+  const Element& elementAt(int r, int c) const;
+  
   void flipBuffer();
 
   void applyReaction();

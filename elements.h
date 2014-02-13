@@ -24,7 +24,7 @@ public:
 
   void add(const ProbEntry& entry) {entries.push_back(entry);}
 
-  ElementID random();
+  ElementID random() const;
 };
 
 typedef std::vector<ProbList> ReactionList;
@@ -46,6 +46,7 @@ public:
   std::vector<Element> elements;
   
   ElementTable(Sand2Spec* spec);
+  int getIndex(const std::string& name);
 };
 
 #endif

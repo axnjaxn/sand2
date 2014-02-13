@@ -4,7 +4,9 @@ extern "C" {
   int yyparse();
 }
 
+#include <cstdlib>
 #include <cstdio>
+#include <ctime>
 #include "world.h"
 #include "pixelrenderer.h"
 
@@ -12,6 +14,8 @@ extern "C" {
 
 int main(int argc, char* argv[]) {
   const int w = 640, h = 480;
+
+  srand(time(NULL));
 
   extern FILE* yyin;
   if (argc < 2) return 0;
@@ -23,7 +27,7 @@ int main(int argc, char* argv[]) {
   ElementTable table(gspec);
   destroySpec(gspec);
 
-  World world(&table, w, h);
+  World world(&table, h, w);
 
   //Initialize SDL and catch init errors
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -47,8 +51,11 @@ int main(int argc, char* argv[]) {
 
   SDL_RenderPresent(renderer);
 
+  int radius = 5, mx, my;
+  ElementID mode = 2;
+
   SDL_Event event;
-  bool exitflag = 0;
+  bool exitflag = 0, mousedown = 0;
   while (!exitflag) {
     while (SDL_PollEvent(&event)) {
       if (event.type == SDL_QUIT) exitflag = 1;
@@ -60,8 +67,28 @@ int main(int argc, char* argv[]) {
       }
     }
 
+    if (SDL_GetMouseState(&mx, &my)&SDL_BUTTON(1)) {
+      for (int bw, by = -radius; by <= radius; by++) {
+	bw = (int)(sqrt(radius * radius - by * by) - 0.75);
+	for (int bx = -bw; bx <= bw; bx++)
+	  world.set(by + my, bx + mx, mode);
+      }
+      world.flipBuffer();
+    }
+    
+    world.iterate();
+
+    for (int r = 0; r < world.nr; r++)
+      for (int c = 0; c < world.nc; c++)
+	px->set(r, c, table.elements[world.at(r, c)].argb);
+    px->redraw();
+
+    SDL_RenderPresent(renderer);
+    
     SDL_Delay(5);    
   }
+
+  delete px;
 
   return 0;
 }
