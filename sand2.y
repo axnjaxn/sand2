@@ -9,9 +9,9 @@ Sand2Spec* gspec = NULL;
 %}
 
 %union {
-  PropertyTable* s2prop;
-  S2List* s2list;
-  Sand2Spec* s2spec;
+  struct _PropertyTable* s2prop;
+  struct _S2List* s2list;
+  struct _Sand2Spec* s2spec;
   char* str;
   float f;
   int i;
@@ -21,17 +21,14 @@ Sand2Spec* gspec = NULL;
 %token <f> NUMBER
 %token ELEMENT DENSITY REACT DECAY COLOR COMMA LPAREN RPAREN COLON
 
-%type <s2spec> spec;
-%type <s2list> element_list element_defs
+%type <s2spec> spec
+%type <s2list> element_defs
 %type <s2prop> properties
 %type <s2list> ptable
 
 %%
 
-spec: 		element_list element_defs {$$ = gspec = makeSpec($1, $2);}
-
-element_list:	IDENT {$$ = cons($1, NULL);}
-	|	IDENT COMMA element_list {$$ = cons($1, $3);}
+spec: 		element_defs {$$ = gspec = makeSpec($1);}
 
 element_defs:	{$$ = NULL;}
 	|	ELEMENT IDENT properties element_defs {$$ = addProperties($2, $3, $4);}
@@ -49,17 +46,5 @@ ptable: 	IDENT NUMBER {$$ = addProb($1, $2, NULL);}
 int yyerror(const char* str) {
   printf("Error: %s\n", str);
   exit(1);
-  return 0;
-}
-
-int main(int argc, char** argv) {
-  extern FILE* yyin;
-  if (argc < 2) return 0;
-  yyin = fopen(argv[1], "r");
-
-  extern Sand2Spec* gspec;
-  yyparse();
-  destroySpec(gspec);
-  
   return 0;
 }

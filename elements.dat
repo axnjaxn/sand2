@@ -1,26 +1,20 @@
 //elements.dat
 //An example of how to define elements for Sand 2.0 by Brian Jackson
 
-//First, there's a comma-separated list of element names
-//This is used internally to compute the size of the element table
-//and assign each name to an id number
-
-//Note that Air and Wall are always included by default, and don't need to be added
-//Air, Wall,
-Sand, Water, Oil, Salt, Saltwater, Plant, Wood, Fire, Steam,
-Torch, Spout, Napalm, CementPowder, CementMix, Radiation, Fallout
-
-//Next, there's the element properties
 //Each element starts with the keyword "element" and a (usually) capitalized name
+//Note that Air and Wall are always included by default, and don't need to be added;
+//however, they would be given default properties, which are totally
+//uninteresting
+
 //Each element can have the following properties:
 //color, density, react, decay
 
 element Air
 	color 0.0, 0.0, 0.0 //Colors must be specified r, g, b in the range 0.0 - 1.0
 	//If density isn't specified, the element will be unaffected by gravity
-	react Torch: fire 1.0
-	react Spout: water 1.0
-	react Radiation: radiation 1.0 //This gives a 100% chance that air touching radiation will become radiation
+	react Torch: fire 1.0 //100% chance that air touching torch bursts into flames - effectively, torch spawns fire
+	react Spout: water 1.0 //Same for spout and water
+	react Radiation: radiation 1.0 //Same for radiation - it's self-propagating
 
 element Wall
 	color 0.75, 0.75, 0.75

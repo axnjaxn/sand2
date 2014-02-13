@@ -33,12 +33,11 @@ void destroyPropertyTable(PropertyTable* table);
 unsigned int toARGB(float r, float g, float b);
 
 struct _Sand2Spec {
-    struct _S2List* names;
     struct _S2List* properties; //List of Property Tables
 };
 typedef struct _Sand2Spec Sand2Spec;
 
-Sand2Spec* makeSpec(S2List* names, S2List* properties);
+Sand2Spec* makeSpec(S2List* properties);
 void destroySpec(Sand2Spec* spec);
 
 #endif

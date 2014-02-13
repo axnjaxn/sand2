@@ -67,11 +67,8 @@ unsigned int toARGB(float r, float g, float b) {
     return 0xFF000000 | (to8(r) << 16) | (to8(g) << 8) | to8(b);
 }
 
-Sand2Spec* makeSpec(S2List* names, S2List* properties) {
+Sand2Spec* makeSpec(S2List* properties) {
     Sand2Spec* spec = malloc(sizeof(Sand2Spec));
-    names = cons("Wall", names);
-    names = cons("Air", names);
-    spec->names = names;
     spec->properties = properties;
     return spec;
 }
@@ -84,6 +81,5 @@ void destroySpec(Sand2Spec* spec) {
 	node = node->next;
     }
     destroyList(spec->properties);
-    destroyList(spec->names);
     free(spec);
 }
