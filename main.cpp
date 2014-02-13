@@ -63,6 +63,10 @@ int main(int argc, char* argv[]) {
 	switch (event.key.keysym.sym) {
 	default: break;
 	case SDLK_ESCAPE: exitflag = 1; break;
+	case SDLK_UP: radius++; break;
+	case SDLK_DOWN: radius--; break;
+	case SDLK_LEFT: mode = (mode + table.elements.size() - 1) % table.elements.size(); break;
+	case SDLK_RIGHT: mode = (mode + 1) % table.elements.size(); break;
 	}
       }
     }

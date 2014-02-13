@@ -1,4 +1,4 @@
-CFLAGS = -g -O2
+CFLAGS = -g -O3
 LFLAGS = -g `sdl2-config --libs` -lfl
 
 all: sand2

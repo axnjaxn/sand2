@@ -12,9 +12,9 @@
 element Air
 	color 0.0, 0.0, 0.0 //Colors must be specified r, g, b in the range 0.0 - 1.0
 	density 0.0 //If density isn't specified, the element will be unaffected by gravity
-	react Torch: fire 1.0 //100% chance that air touching torch bursts into flames - effectively, torch spawns fire
-	react Spout: water 1.0 //Same for spout and water
-	react Radiation: radiation 1.0 //Same for radiation - it's self-propagating
+	react Torch: Fire 1.0 //100% chance that air touching torch bursts into flames - effectively, torch spawns fire
+	react Spout: Water 1.0 //Same for spout and water
+	react Radiation: Radiation 1.0 //Same for radiation - it's self-propagating
 
 element Wall
 	color 0.75, 0.75, 0.75
@@ -57,7 +57,7 @@ element SaltWater
 	react Fire: Salt 0.5, Water 0.5 //This is an example of multiple reactions - each one has a probability of 50%
 	react Radiation: Radiation 1.0
 	react Fallout: Fallout 1.0
-	decay Salt 0.001, Water 0.001 //If the element decays (changes without needing to touch anything) it looks like this
+	decay Salt 0.0005, Water 0.0005 //If the element decays (changes without needing to touch anything) it looks like this
 
 element Plant
 	color 0.0, 1.0, 0.0
@@ -79,7 +79,7 @@ element Fire
 	react Saltwater: Steam 0.4, Salt 0.4
 	react Radiation: Radiation 1.0
 	react Fallout: Fallout 1.0
-	decay Air 1.0
+	decay Air 0.1
 
 element Steam
 	color 0.5, 0.5, 1.0
