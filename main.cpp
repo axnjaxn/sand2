@@ -5,7 +5,7 @@ extern "C" {
 }
 
 #include <cstdio>
-#include "elements.h"
+#include "world.h"
 
 int main(int argc, char* argv[]) {
   extern FILE* yyin;
@@ -15,13 +15,10 @@ int main(int argc, char* argv[]) {
   extern Sand2Spec* gspec;
   yyparse();
 
-
   ElementTable table(gspec);
   destroySpec(gspec);
 
-  printf("Elements:\n");
-  for (int i = 0; i < table.elements.size(); i++)
-    printf("%s\n", table.elements[i].name.c_str());
+  World world(&table, 640, 480);
   
   return 0;
 }

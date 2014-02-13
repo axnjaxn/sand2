@@ -2,13 +2,16 @@ CFLAGS = -g
 
 all: sand2
 
-sand2:	sand2.lex.o sand2.tab.o s2struct.o elements.o main.o
-	$(CXX) -g -o $@ sand2.tab.o sand2.lex.o s2struct.o elements.o main.o -lfl
+sand2:	sand2.lex.o sand2.tab.o s2struct.o elements.o world.o main.o
+	$(CXX) -g -o $@ sand2.tab.o sand2.lex.o s2struct.o elements.o world.o main.o -lfl
 
 main.o: main.cpp s2struct.h sand2.tab.h elements.h
 	$(CXX) -c $< $(CFLAGS)
 
 elements.o: elements.cpp elements.h
+	$(CXX) -c $< $(CFLAGS)
+
+world.o: world.cpp world.h elements.h
 	$(CXX) -c $< $(CFLAGS)
 
 s2struct.o: s2struct.c s2struct.h
