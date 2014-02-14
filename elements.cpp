@@ -86,9 +86,25 @@ ElementTable::ElementTable(Sand2Spec* spec) {
       elements[i].decay.add(ProbEntry((ElementID)j, dnode->p));
     }
   }
+
+  /*
+   * Now make the menu
+   */
+  if (!spec->menu)
+    for (i = 0; i < elements.size(); i++)
+      menu.push_back((ElementID)i);
+  else {
+    for (S2List* node = spec->menu; node; node = node->next) {
+      i = getIndex(node->str);
+      if (i == elements.size()) continue;
+      menu.push_back((ElementID)i);
+    }
+  }
 }
 
 int ElementTable::getIndex(const std::string& name) {
-  //uf
-  return 0;
+  int i;
+  for (i = 0; i < elements.size(); i++)
+    if (name == elements[i].name) break;
+  return i;
 }

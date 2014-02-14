@@ -19,16 +19,20 @@ Sand2Spec* gspec = NULL;
 
 %token <str> IDENT
 %token <f> NUMBER
-%token ELEMENT DENSITY REACT DECAY COLOR COMMA LPAREN RPAREN COLON
+%token MENU ELEMENT DENSITY REACT DECAY COLOR COMMA LPAREN RPAREN COLON
 
 %type <s2spec> spec
-%type <s2list> element_defs
+%type <s2list> menu_defs element_defs
 %type <s2prop> properties
 %type <s2list> ptable
 
 %%
 
-spec: 		element_defs {$$ = gspec = makeSpec($1);}
+spec: 		MENU menu_defs element_defs {$$ = gspec = makeSpec($3, $2);}
+	|	element_defs {$$ = gspec = makeSpec($1, NULL);}
+
+menu_defs:	IDENT {$$ = cons($1, NULL);}
+	|	IDENT COMMA menu_defs {$$ = cons($1, $3);}
 
 element_defs:	{$$ = NULL;}
 	|	ELEMENT IDENT properties element_defs {$$ = addProperties($2, $3, $4);}

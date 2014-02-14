@@ -1,6 +1,15 @@
 //elements.dat
 //An example of how to define elements for Sand 2.0 by Brian Jackson
 
+//First, (optionally), you can put the names of elements you want to include in your menu
+//If you don't specify this, all elements you declare are automatically included
+//If you do specify a menu, *only* the specified elements can be drawn by the user
+//Also, this allows you to rearrange elements into whatever order you like
+menu Air, Wall, Sand, Water, Oil, Salt,
+     SaltWater, Plant, Wood, Fire, Steam,
+     Torch, Spout, Napalm, CementPowder,
+     Radiation
+
 //Each element starts with the keyword "element" and a (usually) capitalized name
 //Note that Air and Wall are always included by default, and don't need to be added;
 //however, they would be given default properties, which are totally

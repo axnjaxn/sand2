@@ -34,10 +34,11 @@ unsigned int toARGB(float r, float g, float b);
 
 struct _Sand2Spec {
     struct _S2List* properties; //List of Property Tables
+    struct _S2List* menu; //Optional: Simple list of names
 };
 typedef struct _Sand2Spec Sand2Spec;
 
-Sand2Spec* makeSpec(S2List* properties);
+Sand2Spec* makeSpec(S2List* properties, S2List* menu);
 void destroySpec(Sand2Spec* spec);
 
 #endif

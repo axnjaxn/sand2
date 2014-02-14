@@ -44,6 +44,7 @@ public:
 class ElementTable {
 public:
   std::vector<Element> elements;
+  std::vector<ElementID> menu;
   
   ElementTable(Sand2Spec* spec);
   int getIndex(const std::string& name);

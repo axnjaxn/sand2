@@ -85,7 +85,8 @@ int main(int argc, char* argv[]) {
   const int osd_time = 2000;
   
   int radius = 7, mx, my, nx, ny;
-  ElementID mode = 2;
+  int modeIndex = 0;
+  ElementID mode = table.menu[0];
 
   SDL_Event event;
   bool exitflag = 0, mousedown = 0;
@@ -110,11 +111,13 @@ int main(int argc, char* argv[]) {
 	  osd.setText("Radius: " + toString(radius), osd_time); 
 	  break;
 	case SDLK_LEFT:
-	  mode = (mode + table.elements.size() - 1) % table.elements.size();
+	  modeIndex = (modeIndex + table.menu.size() - 1) % table.menu.size();
+	  mode = table.menu[modeIndex];
 	  osd.setText("Element: " + table.elements[mode].name, osd_time);
 	  break;
 	case SDLK_RIGHT: 
-	  mode = (mode + 1) % table.elements.size(); 
+	  modeIndex = (modeIndex + 1) % table.menu.size();
+	  mode = table.menu[modeIndex];
 	  osd.setText("Element: " + table.elements[mode].name, osd_time);
 	  break;
 	}

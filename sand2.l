@@ -15,6 +15,7 @@ int yyerror(const char*);
 <<EOF>> {yyterminate();}
 
   /* Basic tokens */
+"menu" return MENU;
 "element" return ELEMENT;
 "density" return DENSITY;
 "color" return COLOR;
