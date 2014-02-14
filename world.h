@@ -25,6 +25,8 @@ public:
   ElementID at(int r, int c) const;
   void set(int r, int c, ElementID id);
   const Element& elementAt(int r, int c) const;
+
+  void clear(ElementID fill = 0);
   
   void flipBuffer();
 

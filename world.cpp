@@ -21,9 +21,7 @@ World::World(ElementTable* table, int nr, int nc) {
   state = new ElementID [nr * nc];
   buffer = new ElementID [nr * nc];
   changes = new bool [nr * nc];
-  memset(state, 0, sizeof(ElementID) * nr * nc);
-  memset(buffer, 0, sizeof(ElementID) * nr * nc);
-  memset(changes, 0, sizeof(bool) * nr * nc);
+  clear();
 }
 
 World::World(const World& world) {
@@ -74,6 +72,11 @@ void World::set(int r, int c, ElementID id) {
 
 const Element& World::elementAt(int r, int c) const {
   return table->elements[at(r, c)];
+}
+
+void World::clear(ElementID fill) {
+  memset(buffer, 0, sizeof(ElementID) * nr * nc);
+  flipBuffer();
 }
 
 void World::flipBuffer() {
