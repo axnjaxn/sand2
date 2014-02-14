@@ -89,7 +89,7 @@ int main(int argc, char* argv[]) {
   ElementID mode = table.menu[0];
 
   SDL_Event event;
-  bool exitflag = 0, mousedown = 0;
+  bool exitflag = 0, mousedown = 0, paused = 0;
   Uint32 ticks = 0, dticks;
   while (!exitflag) {
     while (SDL_PollEvent(&event)) {
@@ -99,6 +99,13 @@ int main(int argc, char* argv[]) {
 	default: break;
 	case SDLK_ESCAPE: exitflag = 1; break;
 	case SDLK_BACKSPACE: world.clear(); osd.setText("World cleared!", osd_time); break;
+	case SDLK_SPACE: 
+	  paused = !paused;
+	  if (paused) 
+	    osd.setText("Paused", osd_time);
+	  else
+	    osd.setText("Resumed", osd_time);
+	  break;
 	case SDLK_f:
 	  osd.setText(toString(1000.0 / dticks) + " FPS", osd_time);
 	  break;
@@ -133,8 +140,9 @@ int main(int argc, char* argv[]) {
     }
     nx = mx;
     ny = my;
-    
-    world.iterate();
+
+    if (!paused)
+      world.iterate();
 
     for (int r = 0; r < world.nr; r++)
       for (int c = 0; c < world.nc; c++)

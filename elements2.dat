@@ -1,0 +1,207 @@
+//elements2.dat
+//An example of how to define elements for Sand 2.0 by Brian Jackson
+//I've since extended the table
+
+//First, (optionally), you can put the names of elements you want to include in your menu
+//If you don't specify this, all elements you declare are automatically included
+//If you do specify a menu, *only* the specified elements can be drawn by the user
+//Also, this allows you to rearrange elements into whatever order you like
+menu Air, Wall, Sand, Water, Oil, Salt,
+     SaltWater, Plant, Wood, Fire, HiFire, Steam,
+     Torch, Spout, Napalm, CementPowder,
+     Ozone, MoltenMetal, HotMetal, Metal,
+     Acetylene, Radiation
+
+
+//Each element starts with the keyword "element" and a (usually) capitalized name
+//Note that Air and Wall are always included by default, and don't need to be added;
+//however, they would be given default properties, which are totally
+//uninteresting
+
+//Each element can have the following properties:
+//color, density, react, decay
+
+element Air
+	color 0.0, 0.0, 0.0 //Colors must be specified r, g, b in the range 0.0 - 1.0
+	density 0.0 //If density isn't specified, the element will be unaffected by gravity
+	react Torch: Fire 1.0 //100% chance that air touching torch bursts into flames - effectively, torch spawns fire
+	react Spout: Water 1.0 //Same for spout and water
+	react Radiation: Radiation 1.0 //Same for radiation - it's self-propagating
+
+element Wall
+	color 0.75, 0.75, 0.75
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+
+element Sand 
+	color 1.0, 0.75, 0.25
+	density 2.0 //Density is arbitrary, but the denser elements seek the bottom
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+
+element Water
+	color 0.0, 0.0, 1.0
+	density 1.0
+	react Salt: Saltwater 0.1
+	react Plant: Plant 1.0
+	react Fire: Steam 0.8
+	react Napalm: Fire 1.0
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+
+element Oil
+	color 0.75, 0.25, 0.25
+	density 0.75
+	react Fire: Fire 1.0
+	react HiFire: HiFire 1.0
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+
+element Salt
+	color 1.0, 1.0, 1.0
+	density 1.5
+	react Water: Saltwater 0.1
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+
+element SaltWater
+	color 0.25, 0.25, 0.75
+	density 1.25
+	react Fire: Salt 0.5, Water 0.5 //This is an example of multiple reactions - each one has a probability of 50%
+	react HiFire: Salt 0.5, Water 0.5
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+	decay Salt 0.0005, Water 0.0005 //If the element decays (changes without needing to touch anything) it looks like this
+
+element Plant
+	color 0.0, 1.0, 0.0
+	react Salt: Wood 0.05
+	react Wood: Wood 0.01
+	react Fire: Fire 1.0
+	react HiFire: Fire 1.0
+	react Napalm: Fire 1.0
+	
+element Wood
+	color 0.75, 0.75, 0.0
+	react Fire: Fire 1.0
+	react HiFire: HiFire 0.5, Fire 0.5
+	react Radiation: Fallout 1.0
+	react Fallout: Fallout 1.0
+
+element Fire
+	color 1.0, 0.0, 0.0
+	density -1.0
+	react Water: Steam 0.8
+	react Saltwater: Steam 0.4, Salt 0.4
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+	decay Air 0.025
+
+element Steam
+	color 0.5, 0.5, 1.0
+	density -0.5
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0	
+	decay Water 0.005
+
+element Torch
+	color 0.75, 0.0, 0.0
+	react HiFire: HiFire 1.0
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+
+element Spout
+	color 0.0, 0.5, 0.0
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+
+element Napalm
+	color 0.75, 0.5, 0.0
+	density 0.5
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+
+element CementPowder
+	color 0.5, 1.0, 0.25
+	density 1.75
+	react Water: CementMix 0.1
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+
+element CementMix
+	color 0.5, 1.0, 0.25
+	density 1.8
+	react Air: Wall 0.02
+	react Wall: Wall 0.01
+	decay Wall 0.002
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+
+element Radiation
+	color 1.0, 0.0, 1.0
+	decay Fallout 0.5
+	
+element Fallout
+	color 0.0, 1.0, 1.0
+	decay Air 0.015
+
+//This allows me to create an upper atmosphere inert to many propagating elements
+
+element Ozone
+	color 0.125, 0.125, 0.25
+	density -5.0
+	react HiFire: Fire 0.5, HiFire 0.1
+	decay InvizOzone 0.01
+
+element InvizOzone
+	density -5.0
+	react HiFire: Fire 0.5, HiFire 0.1
+	color 0.0, 0.0, 0.0
+
+//I like the idea of a metal, too
+
+element SettingMoltenMetal
+	color 1.0, 0.625, 0.0
+	density 10.0
+	decay HotMetal 0.005, MoltenMetal 0.995
+
+element MoltenMetal
+	color 1.0, 0.625, 0.0
+	density 10.0
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+	decay SettingMoltenMetal 0.005
+
+element HotMetal
+	color 1.0, 0.625, 0.0	
+	react HiFire: MoltenMetal 0.05
+	react Air: Metal 0.005
+	decay Metal 0.005
+
+element Metal
+	color 0.75, 0.75, 1.0
+	react Fire: HotMetal 0.05
+	react HiFire: HotMetal 0.05
+	react SaltWater: Wood 0.005
+	react Water: Wood 0.001
+	react MoltenMetal: HotMetal 0.05
+	react HotMetal: HotMetal 0.001
+
+//Ooh, how about really hot fire?
+
+element HiFire
+	color 0.25, 1.0, 1.0
+	density -1.5
+	react Water: Steam 1.0
+	react Saltwater: Steam 0.5, Salt 0.5
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+	decay Fire 0.05
+
+element Acetylene
+	color 0.0, 0.125, 0.0
+	density 0.0
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+	react Hifire: HiFire 1.0
+	react Fire: HiFire 1.0
