@@ -35,7 +35,9 @@ public:
   void applyShift();
   
   void iterate();
-  void draw() { }//uf
+
+  void save(const char* fn) const;
+  int load(const char* fn); //Returns 0 on successful load
 };
 
 #endif

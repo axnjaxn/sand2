@@ -97,6 +97,11 @@ int main(int argc, char* argv[]) {
       else if (event.type == SDL_KEYDOWN) {
 	switch (event.key.keysym.sym) {
 	default: break;
+	case SDLK_F2: world.save("sand2.sav"); osd.setText("World saved to sand2.sav!", osd_time); break;
+	case SDLK_F3: 
+	  if (world.load("sand2.sav")) osd.setText("Could not load sand2.sav!", osd_time);
+	  else osd.setText("World loaded from sand2.sav!", osd_time);
+	  break;	  
 	case SDLK_ESCAPE: exitflag = 1; break;
 	case SDLK_BACKSPACE: world.clear(); osd.setText("World cleared!", osd_time); break;
 	case SDLK_SPACE: 

@@ -153,3 +153,46 @@ void World::iterate() {
   applyDecay();
   applyShift();
 }
+
+#include <cstdio>
+
+void World::save(const char* fn) const {
+  FILE* fp = fopen(fn, "wb");
+  const char* str = "s2-0000";
+  fwrite(str, 1, strlen(str) + 1, fp);
+  fwrite(&nr, sizeof(int), 1, fp);
+  fwrite(&nc, sizeof(int), 1, fp);
+  fwrite(&border, sizeof(ElementID), 1, fp);
+  fwrite(state, sizeof(ElementID), nr * nc, fp);
+  fclose(fp);
+}
+
+int World::load(const char* fn) {
+  FILE* fp = fopen(fn, "rb");
+  if (!fp) return 1;
+
+  const char* str = "s2-0000";
+  char checkstr[8];
+  fread(checkstr, 1, 8, fp);
+  if (strcmp(str, checkstr)) {
+    fclose(fp); 
+    return 2;
+  }
+
+  int nr, nc;
+  fread(&nr, sizeof(int), 1, fp);
+  fread(&nc, sizeof(int), 1, fp);
+  if (nr != this->nr || nc != this->nc) {
+    fclose(fp);
+    return 3;
+  }
+
+  fread(&border, sizeof(ElementID), 1, fp);
+  fread(buffer, sizeof(ElementID), nr * nc, fp);
+
+  fclose(fp);
+
+  flipBuffer();
+
+  return 0;
+}
