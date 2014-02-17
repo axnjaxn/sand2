@@ -74,8 +74,13 @@ const Element& World::elementAt(int r, int c) const {
   return table->elements[at(r, c)];
 }
 
-void World::clear(ElementID fill) {
+void World::clear() {
   memset(buffer, 0, sizeof(ElementID) * nr * nc);
+  flipBuffer();
+}
+
+void World::clearFloor() {
+  memset(buffer + (nr - 1) * nc, 0, sizeof(ElementID) * nc);
   flipBuffer();
 }
 

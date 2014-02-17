@@ -26,7 +26,8 @@ public:
   void set(int r, int c, ElementID id);
   const Element& elementAt(int r, int c) const;
 
-  void clear(ElementID fill = 0);
+  void clear();
+  void clearFloor();
   
   void flipBuffer();
 

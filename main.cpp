@@ -89,7 +89,7 @@ int main(int argc, char* argv[]) {
   ElementID mode = table.menu[0];
 
   SDL_Event event;
-  bool exitflag = 0, mousedown = 0, paused = 0;
+  bool exitflag = 0, mousedown = 0, paused = 0, floor = 1, modeflag = 0;
   Uint32 ticks = 0, dticks;
   while (!exitflag) {
     while (SDL_PollEvent(&event)) {
@@ -111,6 +111,11 @@ int main(int argc, char* argv[]) {
 	  else
 	    osd.setText("Resumed", osd_time);
 	  break;
+	case SDLK_b:
+	  floor = !floor;
+	  if (floor) osd.setText("Bottom boundary on", osd_time);
+	  else osd.setText("Bottom boundary off", osd_time);
+	  break;
 	case SDLK_f:
 	  osd.setText(toString(1000.0 / dticks) + " FPS", osd_time);
 	  break;
@@ -124,20 +129,34 @@ int main(int argc, char* argv[]) {
 	  break;
 	case SDLK_LEFT:
 	  modeIndex = (modeIndex + table.menu.size() - 1) % table.menu.size();
-	  mode = table.menu[modeIndex];
-	  osd.setText("Element: " + table.elements[mode].name, osd_time);
+	  modeflag = 1;
 	  break;
-	case SDLK_RIGHT: 
+	case SDLK_RIGHT:
 	  modeIndex = (modeIndex + 1) % table.menu.size();
-	  mode = table.menu[modeIndex];
-	  osd.setText("Element: " + table.elements[mode].name, osd_time);
+	  modeflag = 1;
 	  break;
+	case SDLK_0: modeIndex = 0; modeflag = 1; break;
+	case SDLK_1: modeIndex = 1; modeflag = 1; break;
+	case SDLK_2: if (table.elements.size() >= 2) modeIndex = 2; modeflag = 1; break;
+	case SDLK_3: if (table.elements.size() >= 3) modeIndex = 3; modeflag = 1; break;
+	case SDLK_4: if (table.elements.size() >= 4) modeIndex = 4; modeflag = 1; break;
+	case SDLK_5: if (table.elements.size() >= 5) modeIndex = 5; modeflag = 1; break;
+	case SDLK_6: if (table.elements.size() >= 6) modeIndex = 6; modeflag = 1; break;
+	case SDLK_7: if (table.elements.size() >= 7) modeIndex = 7; modeflag = 1; break;
+	case SDLK_8: if (table.elements.size() >= 8) modeIndex = 8; modeflag = 1; break;
+	case SDLK_9: if (table.elements.size() >= 9) modeIndex = 9; modeflag = 1; break;
 	}
       }
     }
 
     dticks = SDL_GetTicks() - ticks;
     ticks += dticks;
+
+    if (modeflag) {
+      modeflag = 0;
+      mode = table.menu[modeIndex];
+      osd.setText("Element: " + table.elements[mode].name, osd_time);
+    }
 
     if (SDL_GetMouseState(&mx, &my)&SDL_BUTTON(1)) {
       drawElement(world, mode, mx, my, nx, ny, radius);
@@ -146,8 +165,10 @@ int main(int argc, char* argv[]) {
     nx = mx;
     ny = my;
 
-    if (!paused)
+    if (!paused) {
       world.iterate();
+      if (!floor) world.clearFloor();
+    }
 
     for (int r = 0; r < world.nr; r++)
       for (int c = 0; c < world.nc; c++)
