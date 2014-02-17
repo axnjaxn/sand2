@@ -121,12 +121,11 @@ element CementPowder
 	react Fallout: Fallout 1.0
 
 element CementMix
-	color 0.5, 1.0, 0.25
+	color 0.4, 0.8, 0.25
 	density 1.8
-	react Air: Wall 0.02
-	react Wall: Wall 0.01
-	decay Wall 0.002
-	react Radiation: Radiation 1.0
+	react Wall: Wall 0.001
+	decay Wall 0.0002
+	react Radiation: Radiation 1.0	
 	react Fallout: Fallout 1.0
 
 element Radiation

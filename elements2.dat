@@ -10,7 +10,7 @@ menu Air, Wall, Sand, Water, Oil, Salt,
      SaltWater, Plant, Wood, Fire, HiFire, Steam,
      Torch, Spout, Napalm, CementPowder,
      Ozone, MoltenMetal, HotMetal, Metal,
-     Acetylene, Radiation
+     Acetylene, Radiation, Snow
 
 
 //Each element starts with the keyword "element" and a (usually) capitalized name
@@ -52,8 +52,8 @@ element Water
 element Oil
 	color 0.75, 0.25, 0.25
 	density 0.75
-	react Fire: Fire 1.0
-	react HiFire: HiFire 1.0
+	react Fire: Fire 0.5, HiFire 0.5
+	react HiFire: Fire 0.5, HiFire 0.5
 	react Radiation: Radiation 1.0
 	react Fallout: Fallout 1.0
 
@@ -66,12 +66,12 @@ element Salt
 
 element SaltWater
 	color 0.25, 0.25, 0.75
-	density 1.25
+	density 1.0
 	react Fire: Salt 0.5, Water 0.5 //This is an example of multiple reactions - each one has a probability of 50%
 	react HiFire: Salt 0.5, Water 0.5
 	react Radiation: Radiation 1.0
 	react Fallout: Fallout 1.0
-	decay Salt 0.0005, Water 0.0005 //If the element decays (changes without needing to touch anything) it looks like this
+	decay Salt 0.0001, Water 0.0001 //If the element decays (changes without needing to touch anything) it looks like this
 
 element Plant
 	color 0.0, 1.0, 0.0
@@ -129,12 +129,11 @@ element CementPowder
 	react Fallout: Fallout 1.0
 
 element CementMix
-	color 0.5, 1.0, 0.25
+	color 0.4, 0.8, 0.25
 	density 1.8
-	react Air: Wall 0.02
-	react Wall: Wall 0.01
-	decay Wall 0.002
-	react Radiation: Radiation 1.0
+	react Wall: Wall 0.001
+	decay Wall 0.0002
+	react Radiation: Radiation 1.0	
 	react Fallout: Fallout 1.0
 
 element Radiation
@@ -163,11 +162,13 @@ element InvizOzone
 element SettingMoltenMetal
 	color 1.0, 0.625, 0.0
 	density 10.0
-	decay HotMetal 0.005, MoltenMetal 0.995
+	react HotMetal: HotMetal 0.001
+	decay HotMetal 0.01, MoltenMetal 0.995
 
 element MoltenMetal
-	color 1.0, 0.625, 0.0
+	color 1.0, 0.8, 0.0
 	density 10.0
+	react HotMetal: HotMetal 0.001
 	react Radiation: Radiation 1.0
 	react Fallout: Fallout 1.0
 	decay SettingMoltenMetal 0.005
@@ -176,12 +177,13 @@ element HotMetal
 	color 1.0, 0.625, 0.0	
 	react HiFire: MoltenMetal 0.05
 	react Air: Metal 0.005
+	react Metal: Metal 0.001
 	decay Metal 0.005
 
 element Metal
 	color 0.75, 0.75, 1.0
-	react Fire: HotMetal 0.05
-	react HiFire: HotMetal 0.05
+	react Fire: HotMetal 0.9
+	react HiFire: HotMetal 0.9
 	react SaltWater: Wood 0.005
 	react Water: Wood 0.001
 	react MoltenMetal: HotMetal 0.05
@@ -205,3 +207,24 @@ element Acetylene
 	react Fallout: Fallout 1.0
 	react Hifire: HiFire 1.0
 	react Fire: HiFire 1.0
+
+// How about snow? This is a neat trick
+
+element BlowSnow
+	color 0.8, 0.8, 1.0
+	density 0.0
+	react Fire: Water 0.1
+	react HiFire: Steam 1.0
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+	decay Snow 0.5
+
+element Snow
+	color 0.8, 0.8, 1.0
+	density 0.5
+	react Water: Water 0.01
+	react Fire: Water 0.1
+	react HiFire: Steam 1.0
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+	decay Water 0.0001, BlowSnow 0.5
