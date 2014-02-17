@@ -1,9 +1,16 @@
 CFLAGS = -g -O3 -Wno-unused-result
+
+ifndef MINGW
 LFLAGS = -g `sdl2-config --libs` -lfl
+EXT = 
+else
+LFLAGS = -g `sdl2-config --libs` -lfl
+EXT = .exe
+endif
 
-all: sand2
+all: sand2$(EXT) 
 
-sand2:	sand2.lex.o sand2.tab.o s2struct.o elements.o world.o pixelrenderer.o osd.o bbc_font.o main.o
+sand2$(EXT): sand2.lex.o sand2.tab.o s2struct.o elements.o world.o pixelrenderer.o osd.o bbc_font.o main.o
 	$(CXX) -g -o $@ \
 		sand2.tab.o sand2.lex.o s2struct.o elements.o world.o \
 		pixelrenderer.o osd.o bbc_font.o main.o $(LFLAGS)
@@ -42,5 +49,5 @@ clean:
 	rm -f sand2 *.o *~ \
 	sand2.lex.c sand2.tab.c sand2.tab.h
 
-run: sand2 elements.dat
-	./sand2 elements.dat
+run: sand2 elements2.dat
+	./sand2 elements2.dat
