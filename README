@@ -13,3 +13,8 @@ configure the elements to behave as you please.
 
 If everything works out alright, this test project will also teach me to use 
 GitHub as opposed to just local Git repositories.
+
+Dependencies:
+- SDL 2.0
+- Flex and Bison
+- Patience? :D
