@@ -45,7 +45,7 @@ void drawElement(World& world, ElementID mode, int x0, int y0, int x1, int y1, i
 }
 
 int main(int argc, char* argv[]) {
-  const int w = 640, h = 480;
+  const int w = 640, h = 400, sc = 2;
 
   srand(time(NULL));
 
@@ -71,7 +71,7 @@ int main(int argc, char* argv[]) {
   SDL_Window* window = SDL_CreateWindow(TITLE,
 					SDL_WINDOWPOS_CENTERED,
 					SDL_WINDOWPOS_CENTERED,
-					w, h,
+					w * sc, h * sc,
 					0);
   SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
 
@@ -159,7 +159,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (SDL_GetMouseState(&mx, &my)&SDL_BUTTON(1)) {
-      drawElement(world, mode, mx, my, nx, ny, radius);
+      drawElement(world, mode, mx / sc, my / sc, nx / sc, ny / sc, radius);
       world.flipBuffer();
     }
     nx = mx;
