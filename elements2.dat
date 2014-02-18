@@ -10,7 +10,7 @@ menu Air, Wall, Sand, Water, Oil, Salt,
      SaltWater, Plant, Wood, Fire, HiFire, Steam,
      Torch, Spout, Napalm, CementPowder,
      Ozone, MoltenMetal, HotMetal, Metal,
-     Acetylene, Radiation, Snow
+     Acetylene, AcetyleneEmitter, Radiation, Snow
 
 
 //Each element starts with the keyword "element" and a (usually) capitalized name
@@ -27,6 +27,7 @@ element Air
 	react Torch: Fire 1.0 //100% chance that air touching torch bursts into flames - effectively, torch spawns fire
 	react Spout: Water 1.0 //Same for spout and water
 	react Radiation: Radiation 1.0 //Same for radiation - it's self-propagating
+	react AcetyleneEmitter: Acetylene 1.0
 
 element Wall
 	color 0.75, 0.75, 0.75
@@ -207,6 +208,11 @@ element Acetylene
 	react Fallout: Fallout 1.0
 	react Hifire: HiFire 1.0
 	react Fire: HiFire 1.0
+
+element AcetyleneEmitter
+	color 0.4, 0.9, 0.0
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
 
 // How about snow? This is a neat trick
 
