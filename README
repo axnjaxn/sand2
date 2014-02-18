@@ -1,0 +1,13 @@
+sand2
+Project by Brian Jackson
+
+This is called "sand2" because it's my second attempt at a clone of the Falling Sand Game that was popular a few years ago.
+
+It's not super-detailed or super-geared towards collaboration and open source workflow - that much I'm aware of. I might re-comment things, but for now it's intended to be proof-of-concept. 
+
+My goals were to show that:
+1. SDL 2.0 isn't super scary
+2. Flex and Bison can be used in conjunction with a C++ system of classes
+3. The Falling Sand Game could be kind of neat when you can completely configure the elements to behave as you please.
+
+If everything works out alright, this test project will also teach me to use GitHub as opposed to just local Git repositories.
