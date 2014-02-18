@@ -96,7 +96,8 @@ int main(int argc, char* argv[]) {
     while (SDL_PollEvent(&event)) {
       if (event.type == SDL_QUIT) exitflag = 1;
       else if (event.type == SDL_MOUSEBUTTONDOWN) {
-	SDL_GetMouseState(&nx, &ny);
+	mx = nx = event.button.x;
+	my = ny = event.button.y;
 	if (event.button.button == SDL_BUTTON_LEFT) 
 	  mousedown = 1; 
 	else if (event.button.button == SDL_BUTTON_RIGHT) 
@@ -104,10 +105,14 @@ int main(int argc, char* argv[]) {
       }
       else if (event.type == SDL_MOUSEBUTTONUP) {
 	if (mousedown == 2) {
-	  drawElement(world, mode, mx / sc, my / sc, nx / sc, ny / sc, radius);
+	  drawElement(world, mode, mx, my, nx, ny, radius);
 	  world.flipBuffer();
 	}
 	mousedown = 0;
+      }
+      else if (event.type == SDL_MOUSEMOTION) {
+	mx = event.motion.x;
+	my = event.motion.y;
       }
       else if (event.type == SDL_KEYDOWN) {
 	switch (event.key.keysym.sym) {
@@ -174,16 +179,12 @@ int main(int argc, char* argv[]) {
     }
 
     if (mousedown == 1) {
-      SDL_GetMouseState(&mx, &my);
-      drawElement(world, mode, mx / sc, my / sc, nx / sc, ny / sc, radius);
+      drawElement(world, mode, mx, my, nx, ny, radius);
       world.flipBuffer();
       nx = mx;
       ny = my;
     } 
-    else if (mousedown == 2) {
-      SDL_GetMouseState(&mx, &my);
-    }
-
+ 
     if (!paused) {
       world.iterate();
       if (!floor) world.clearFloor();
@@ -197,9 +198,9 @@ int main(int argc, char* argv[]) {
     osd.render(renderer, 0, 0, 2);
     if (mousedown == 2) {
       SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-      SDL_RenderDrawLine(renderer, mx / sc, my / sc, nx / sc, ny / sc);
-      SDL_RenderDrawLine(renderer, mx / sc - 5, my / sc, mx / sc + 5, my / sc);
-      SDL_RenderDrawLine(renderer, mx / sc, my / sc - 5, mx / sc, my / sc + 5);
+      SDL_RenderDrawLine(renderer, mx, my, nx, ny);
+      SDL_RenderDrawLine(renderer, mx - 5, my, mx + 5, my);
+      SDL_RenderDrawLine(renderer, mx, my - 5, mx, my + 5);
     }
 
     SDL_RenderPresent(renderer);
