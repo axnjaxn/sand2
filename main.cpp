@@ -89,11 +89,26 @@ int main(int argc, char* argv[]) {
   ElementID mode = table.menu[0];
 
   SDL_Event event;
-  bool exitflag = 0, mousedown = 0, paused = 0, floor = 1, modeflag = 0;
+  bool exitflag = 0, paused = 0, floor = 1, modeflag = 0;
+  int mousedown = 0;
   Uint32 ticks = 0, dticks;
   while (!exitflag) {
     while (SDL_PollEvent(&event)) {
       if (event.type == SDL_QUIT) exitflag = 1;
+      else if (event.type == SDL_MOUSEBUTTONDOWN) {
+	SDL_GetMouseState(&nx, &ny);
+	if (event.button.button == SDL_BUTTON_LEFT) 
+	  mousedown = 1; 
+	else if (event.button.button == SDL_BUTTON_RIGHT) 
+	  mousedown = 2;
+      }
+      else if (event.type == SDL_MOUSEBUTTONUP) {
+	if (mousedown == 2) {
+	  drawElement(world, mode, mx / sc, my / sc, nx / sc, ny / sc, radius);
+	  world.flipBuffer();
+	}
+	mousedown = 0;
+      }
       else if (event.type == SDL_KEYDOWN) {
 	switch (event.key.keysym.sym) {
 	default: break;
@@ -158,12 +173,16 @@ int main(int argc, char* argv[]) {
       osd.setText("Element: " + table.elements[mode].name, osd_time);
     }
 
-    if (SDL_GetMouseState(&mx, &my)&SDL_BUTTON(1)) {
+    if (mousedown == 1) {
+      SDL_GetMouseState(&mx, &my);
       drawElement(world, mode, mx / sc, my / sc, nx / sc, ny / sc, radius);
       world.flipBuffer();
+      nx = mx;
+      ny = my;
+    } 
+    else if (mousedown == 2) {
+      SDL_GetMouseState(&mx, &my);
     }
-    nx = mx;
-    ny = my;
 
     if (!paused) {
       world.iterate();
@@ -176,6 +195,12 @@ int main(int argc, char* argv[]) {
     px->redraw();
 
     osd.render(renderer, 0, 0, 2);
+    if (mousedown == 2) {
+      SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+      SDL_RenderDrawLine(renderer, mx / sc, my / sc, nx / sc, ny / sc);
+      SDL_RenderDrawLine(renderer, mx / sc - 5, my / sc, mx / sc + 5, my / sc);
+      SDL_RenderDrawLine(renderer, mx / sc, my / sc - 5, mx / sc, my / sc + 5);
+    }
 
     SDL_RenderPresent(renderer);
     
