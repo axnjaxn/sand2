@@ -44,6 +44,15 @@ void drawElement(World& world, ElementID mode, int x0, int y0, int x1, int y1, i
   }    
 }
 
+void drawElementRect(World& world, ElementID mode, int x0, int y0, int x1, int y1) {
+  int t;
+  if (y0 > y1) {t = y0; y0 = y1; y1 = t;}
+  if (x0 > x1) {t = x0; x0 = x1; x1 = t;}
+  for (int y = y0; y <= y1; y++)
+    for (int x = x0; x <= x1; x++)
+      world.set(y, x, mode);
+}
+
 int main(int argc, char* argv[]) {
   const int w = 640, h = 400, sc = 2;
 
@@ -89,7 +98,7 @@ int main(int argc, char* argv[]) {
   ElementID mode = table.menu[0];
 
   SDL_Event event;
-  bool exitflag = 0, paused = 0, floor = 1, modeflag = 0;
+  bool exitflag = 0, paused = 0, floor = 1, modeflag = 0, shiftflag = 0;
   int mousedown = 0;
   Uint32 ticks = 0, dticks;
   while (!exitflag) {
@@ -105,7 +114,8 @@ int main(int argc, char* argv[]) {
       }
       else if (event.type == SDL_MOUSEBUTTONUP) {
 	if (mousedown == 2) {
-	  drawElement(world, mode, mx, my, nx, ny, radius);
+	  if (shiftflag) drawElementRect(world, mode, mx, my, nx, ny);
+	  else drawElement(world, mode, mx, my, nx, ny, radius);
 	  world.flipBuffer();
 	}
 	mousedown = 0;
@@ -165,7 +175,11 @@ int main(int argc, char* argv[]) {
 	case SDLK_7: if (table.elements.size() >= 7) modeIndex = 7; modeflag = 1; break;
 	case SDLK_8: if (table.elements.size() >= 8) modeIndex = 8; modeflag = 1; break;
 	case SDLK_9: if (table.elements.size() >= 9) modeIndex = 9; modeflag = 1; break;
+	case SDLK_LSHIFT: shiftflag = 1; break;
 	}
+      }
+      else if (event.type == SDL_KEYUP) {
+	if (event.key.keysym.sym == SDLK_LSHIFT) shiftflag = 0;
       }
     }
 
@@ -198,9 +212,17 @@ int main(int argc, char* argv[]) {
     osd.render(renderer, 0, 0, 2);
     if (mousedown == 2) {
       SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-      SDL_RenderDrawLine(renderer, mx, my, nx, ny);
-      SDL_RenderDrawLine(renderer, mx - 5, my, mx + 5, my);
-      SDL_RenderDrawLine(renderer, mx, my - 5, mx, my + 5);
+      if (!shiftflag) {
+	SDL_RenderDrawLine(renderer, mx, my, nx, ny);
+	SDL_RenderDrawLine(renderer, mx - radius, my, mx + radius, my);
+	SDL_RenderDrawLine(renderer, mx, my - radius, mx, my + radius);
+      }
+      else {
+	SDL_RenderDrawLine(renderer, mx, my, nx, my);
+	SDL_RenderDrawLine(renderer, nx, my, nx, ny);
+	SDL_RenderDrawLine(renderer, nx, ny, mx, ny);
+	SDL_RenderDrawLine(renderer, mx, ny, mx, my);
+      }
     }
 
     SDL_RenderPresent(renderer);
