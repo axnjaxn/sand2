@@ -97,8 +97,10 @@ int main(int argc, char* argv[]) {
   int modeIndex = 0;
   ElementID mode = table.menu[0];
 
+  int drawmode = 0;
+
   SDL_Event event;
-  bool exitflag = 0, paused = 0, floor = 1, modeflag = 0, shiftflag = 0;
+  bool exitflag = 0, paused = 0, floor = 1, modeflag = 0;
   int mousedown = 0;
   Uint32 ticks = 0, dticks;
   while (!exitflag) {
@@ -114,7 +116,7 @@ int main(int argc, char* argv[]) {
       }
       else if (event.type == SDL_MOUSEBUTTONUP) {
 	if (mousedown == 2) {
-	  if (shiftflag) drawElementRect(world, mode, mx, my, nx, ny);
+	  if (drawmode) drawElementRect(world, mode, mx, my, nx, ny);
 	  else drawElement(world, mode, mx, my, nx, ny, radius);
 	  world.flipBuffer();
 	}
@@ -175,11 +177,8 @@ int main(int argc, char* argv[]) {
 	case SDLK_7: if (table.elements.size() >= 7) modeIndex = 7; modeflag = 1; break;
 	case SDLK_8: if (table.elements.size() >= 8) modeIndex = 8; modeflag = 1; break;
 	case SDLK_9: if (table.elements.size() >= 9) modeIndex = 9; modeflag = 1; break;
-	case SDLK_LSHIFT: shiftflag = 1; break;
+	case SDLK_LSHIFT: drawmode = !drawmode; break;
 	}
-      }
-      else if (event.type == SDL_KEYUP) {
-	if (event.key.keysym.sym == SDLK_LSHIFT) shiftflag = 0;
       }
     }
 
@@ -212,7 +211,7 @@ int main(int argc, char* argv[]) {
     osd.render(renderer, 0, 0, 2);
     if (mousedown == 2) {
       SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-      if (!shiftflag) {
+      if (!drawmode) {
 	SDL_RenderDrawLine(renderer, mx, my, nx, ny);
 	SDL_RenderDrawLine(renderer, mx - radius, my, mx + radius, my);
 	SDL_RenderDrawLine(renderer, mx, my - radius, mx, my + radius);
