@@ -240,7 +240,6 @@ element Snow
 element BurningWood
 	color 0.875, 0.75, 0.0
 	density 0.5
-	react Water: Sand 0.01
 	react HiFire: HiFire 0.5, Fire 0.5
 	react Radiation: Fallout 1.0
 	react Fallout: Fallout 1.0
