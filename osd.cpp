@@ -2,15 +2,25 @@
 
 BBC_Font OSD::font;
 
-OSD::OSD() {start = end = 0; setColor(255, 255, 255); fade = vanish = 0;}
+OSD::OSD() {start = end = 0; setColor(255, 255, 255); setTime(3000); fade = vanish = 0;}
 
-void OSD::setText(const std::string& text, Uint32 t) {
+void OSD::setText(const std::string& text) {
   this->text = text;
   start = SDL_GetTicks();
-  end = start + t;
+  end = start + fadetime;
+}
+
+void OSD::setTextf(const char* str, ...) {
+  va_list args;
+  va_start(args, str);
+  char buf[1024];
+  vsprintf(buf, str, args);
+  setText(buf);
 }
 
 void OSD::setColor(Uint8 r, Uint8 g, Uint8 b) {this->r = r; this->g = g; this->b = b;}
+
+void OSD::setTime(Uint32 fadetime) {this->fadetime = fadetime;}
 
 void OSD::enableFade(bool enable) {fade = enable;}
 

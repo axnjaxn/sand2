@@ -9,14 +9,16 @@ public:
   static BBC_Font font;
 
   std::string text;
-  Uint32 start, end;
+  Uint32 start, end, fadetime;
   Uint8 r, g, b;
   bool fade, vanish;
 
   OSD();
 
-  void setText(const std::string& text, Uint32 t);
+  void setText(const std::string& text);
+  void setTextf(const char* str, ...);
   void setColor(Uint8 r, Uint8 g, Uint8 b);
+  void setTime(Uint32 fadetime);
   void enableFade(bool enable = 1);
   void enableVanish(bool enable = 1);
 

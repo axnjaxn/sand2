@@ -13,14 +13,6 @@ extern "C" {
 
 #define TITLE "Sand2 by Brian Jackson"
 
-#include <sstream>
-template <typename tn>
-std::string toString(const tn& t) {
-  std::ostringstream oss;
-  oss << t;
-  return oss.str();
-}
-
 void drawElement(World& world, ElementID mode, int x, int y, int radius) {
   for (int bw, by = -radius; by <= radius; by++) {
     bw = (int)(sqrt(radius * radius - by * by) - 0.75);
@@ -92,7 +84,9 @@ int main(int argc, char* argv[]) {
 
   OSD osd;
   osd.enableFade();
-  osd.setText("Arrows to change element / size", 5000);
+  osd.setTime(5000);
+  osd.setText("Arrows to change element / size");
+  osd.setTime(3000);
   const int osd_time = 2000;
   
   int radius = 7, mx, my, nx, ny;
@@ -131,35 +125,35 @@ int main(int argc, char* argv[]) {
       else if (event.type == SDL_KEYDOWN) {
 	switch (event.key.keysym.sym) {
 	default: break;
-	case SDLK_F2: world.save("sand2.sav"); osd.setText("World saved to sand2.sav!", osd_time); break;
+	case SDLK_F2: world.save("sand2.sav"); osd.setText("World saved to sand2.sav!"); break;
 	case SDLK_F3: 
-	  if (world.load("sand2.sav")) osd.setText("Could not load sand2.sav!", osd_time);
-	  else osd.setText("World loaded from sand2.sav!", osd_time);
+	  if (world.load("sand2.sav")) osd.setText("Could not load sand2.sav!");
+	  else osd.setText("World loaded from sand2.sav!");
 	  break;	  
 	case SDLK_ESCAPE: exitflag = 1; break;
-	case SDLK_BACKSPACE: world.clear(); osd.setText("World cleared!", osd_time); break;
+	case SDLK_BACKSPACE: world.clear(); osd.setText("World cleared!"); break;
 	case SDLK_SPACE: 
 	  paused = !paused;
 	  if (paused) 
-	    osd.setText("Paused", osd_time);
+	    osd.setText("Paused");
 	  else
-	    osd.setText("Resumed", osd_time);
+	    osd.setText("Resumed");
 	  break;
 	case SDLK_b:
 	  floor = !floor;
-	  if (floor) osd.setText("Bottom boundary on", osd_time);
-	  else osd.setText("Bottom boundary off", osd_time);
+	  if (floor) osd.setText("Bottom boundary on");
+	  else osd.setText("Bottom boundary off");
 	  break;
 	case SDLK_f:
-	  osd.setText(toString(1000.0 / dticks) + " FPS", osd_time);
+	  osd.setTextf("%.1f FPS", 1000.0 / dticks);
 	  break;
 	case SDLK_UP:
 	  radius++; 
-	  osd.setText("Radius: " + toString(radius), osd_time); 
+	  osd.setTextf("Radius: %d", radius); 
 	  break;
 	case SDLK_DOWN: 
 	  radius--; 
-	  osd.setText("Radius: " + toString(radius), osd_time); 
+	  osd.setTextf("Radius: %d", radius);
 	  break;
 	case SDLK_LEFT:
 	  modeIndex = (modeIndex + table.menu.size() - 1) % table.menu.size();
@@ -190,7 +184,7 @@ int main(int argc, char* argv[]) {
     if (modeflag) {
       modeflag = 0;
       mode = table.menu[modeIndex];
-      osd.setText("Element: " + table.elements[mode].name, osd_time);
+      osd.setText("Element: " + table.elements[mode].name);
     }
 
     if (mousedown == 1) {
