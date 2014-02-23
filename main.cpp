@@ -83,6 +83,7 @@ int main(int argc, char* argv[]) {
 					w * sc, h * sc,
 					0);
   SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
+  SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
   PixelRenderer* px = new PixelRenderer(renderer, w, h);
   SDL_RenderSetLogicalSize(renderer, w, h);
@@ -90,6 +91,7 @@ int main(int argc, char* argv[]) {
   SDL_RenderClear(renderer);
 
   OSD osd;
+  osd.enableFade();
   osd.setText("Arrows to change element / size", 5000);
   const int osd_time = 2000;
   
