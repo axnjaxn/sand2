@@ -89,14 +89,14 @@ int main(int argc, char* argv[]) {
   osd.setTime(3000);
   const int osd_time = 2000;
   
-  int radius = 7, mx, my, nx, ny;
-  int modeIndex = 0;
-  ElementID mode = table.menu[0];
+  int radius = 3, mx, my, nx, ny;
+  int modeIndex = (table.menu.size() > 2)? 2 : table.menu.size() - 1;
+  ElementID mode = table.menu[modeIndex];
 
   int drawmode = 0;
 
   SDL_Event event;
-  bool exitflag = 0, paused = 0, floor = 1, modeflag = 0;
+  bool exitflag = 0, paused = 0, floor = 1, modeflag = 0, slowmo = 0;
   int mousedown = 0;
   Uint32 ticks = 0, dticks;
   while (!exitflag) {
@@ -146,6 +146,10 @@ int main(int argc, char* argv[]) {
 	  break;
 	case SDLK_f:
 	  osd.setTextf("%.1f FPS", 1000.0 / dticks);
+	  break;
+	case SDLK_s:
+	  slowmo = !slowmo;
+	  osd.setTextf("Slowmo: %s", (slowmo)? "on" : "off");
 	  break;
 	case SDLK_UP:
 	  radius++; 
@@ -220,9 +224,11 @@ int main(int argc, char* argv[]) {
       }
     }
 
+
     SDL_RenderPresent(renderer);
-    
-    SDL_Delay(5);    
+
+    if (slowmo) SDL_Delay(100);
+    else SDL_Delay(5);
   }
 
   delete px;
