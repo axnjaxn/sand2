@@ -10,7 +10,8 @@ menu Air, Wall, Sand, Water, Oil, Salt,
      SaltWater, Plant, Wood, Fire, HiFire, Steam,
      Torch, Spout, Napalm, CementPowder,
      Ozone, MoltenMetal, HotMetal, Metal,
-     Acetylene, AcetyleneEmitter, Radiation, Snow
+     Acetylene, AcetyleneEmitter, Snow, Fuse, 
+     Radiation
 
 
 //Each element starts with the keyword "element" and a (usually) capitalized name
@@ -91,10 +92,18 @@ element Wood
 	react Radiation: Fallout 1.0
 	react Fallout: Fallout 1.0
 
+element BurningWood
+	color 0.875, 0.75, 0.0
+	density 0.5
+	react HiFire: HiFire 0.5, Fire 0.5
+	react Radiation: Fallout 1.0
+	react Fallout: Fallout 1.0
+	decay Fire 0.05
+
 element Fire
 	color 1.0, 0.0, 0.0
 	density -1.0
-	react Water: Steam 0.8
+	react Water: Air 0.8
 	react Saltwater: Steam 0.4, Salt 0.4
 	react Radiation: Radiation 1.0
 	react Fallout: Fallout 1.0
@@ -106,6 +115,16 @@ element Steam
 	react Radiation: Radiation 1.0
 	react Fallout: Fallout 1.0	
 	decay Water 0.005
+
+element Snow
+	color 0.8, 0.8, 1.0
+	density 0.5
+	react Water: Water 0.01
+	react Fire: Water 0.1
+	react HiFire: Steam 1.0
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+	decay Water 0.0001, BlowSnow 0.5
 
 element Torch
 	color 0.75, 0.0, 0.0
@@ -227,20 +246,15 @@ element BlowSnow
 	react Fallout: Fallout 1.0
 	decay Snow 0.5
 
-element Snow
-	color 0.8, 0.8, 1.0
-	density 0.5
-	react Water: Water 0.01
-	react Fire: Water 0.1
-	react HiFire: Steam 1.0
-	react Radiation: Radiation 1.0
-	react Fallout: Fallout 1.0
-	decay Water 0.0001, BlowSnow 0.5
+// This is a slow-burning element
 
-element BurningWood
-	color 0.875, 0.75, 0.0
-	density 0.5
-	react HiFire: HiFire 0.5, Fire 0.5
+element Fuse
+	color 0.125, 0.25, 0.25
+	react HiFire: Fire 0.5, LitFuse 0.5
+	react Fire: LitFuse 1.0
+
+element LitFuse
+	color 1.0, 0.25, 0.25
 	react Radiation: Fallout 1.0
 	react Fallout: Fallout 1.0
-	decay Fire 0.05
+	decay Fire 0.02
