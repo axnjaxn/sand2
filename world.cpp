@@ -54,6 +54,8 @@ World& World::operator=(const World& world) {
   nc = world.nc;
   state = new ElementID [nr * nc];
   buffer = new ElementID [nr * nc];
+  pressure = new int [nr * nc];
+  pbuffer = new int [nr * nc];
   changes = new bool [nr * nc];
   memcpy(state, world.state, nr * nc * sizeof(ElementID));
   memcpy(buffer, world.buffer, nr * nc * sizeof(ElementID));
