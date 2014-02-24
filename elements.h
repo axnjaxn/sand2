@@ -34,6 +34,7 @@ public:
   std::string name; 
   bool fixed;
   float density;
+  int pressure;
   unsigned int argb;
   ProbList decay;
   ReactionList reactions;
