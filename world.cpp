@@ -154,8 +154,8 @@ void World::applyShift() {
 }
 
 void World::iterate() {
-  applyReaction();
   applyDecay();
+  applyReaction();
   applyShift();
 }
 
