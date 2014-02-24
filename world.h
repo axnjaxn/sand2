@@ -13,6 +13,7 @@ public:
   ElementID border;
   int nr, nc;
   ElementID *state, *buffer;
+  int *pressure, *pbuffer;
   bool* changes;
 
   World(ElementTable* table, int nr, int nc);
@@ -24,7 +25,9 @@ public:
   bool changed(int r, int c) const;
   ElementID at(int r, int c) const;
   void set(int r, int c, ElementID id);
+  void set(int r, int c, ElementID id, int pressure);
   const Element& elementAt(int r, int c) const;
+  int pressureAt(int r, int c) const;
 
   void clear();
   void clearFloor();

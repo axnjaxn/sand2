@@ -9,8 +9,9 @@ void World::react(int r0, int c0, int r1, int c1) {
 
 void World::swap(int r0, int c0, int r1, int c1) {
   ElementID t = at(r0, c0);
-  set(r0, c0, at(r1, c1));
-  set(r1, c1, t);  
+  int p = pressureAt(r0, c0);
+  set(r0, c0, at(r1, c1), pressureAt(r1, c1));
+  set(r1, c1, t, p);
 }
 
 World::World(ElementTable* table, int nr, int nc) {
@@ -20,6 +21,8 @@ World::World(ElementTable* table, int nr, int nc) {
   this->border = 1;//Wall by default
   state = new ElementID [nr * nc];
   buffer = new ElementID [nr * nc];
+  pressure = new int [nr * nc];
+  pbuffer = new int [nr * nc];
   changes = new bool [nr * nc];
   clear();
 }
@@ -33,12 +36,16 @@ World::World(const World& world) {
 World::~World() {
   if (state) delete [] state;
   if (buffer) delete [] buffer;
+  if (pressure) delete [] pressure;
+  if (pbuffer) delete [] pbuffer;
   if (changes) delete [] changes;
 }
 
 World& World::operator=(const World& world) {
   if (state) delete [] state;
   if (buffer) delete [] buffer;
+  if (pressure) delete [] pressure;
+  if (pbuffer) delete [] pbuffer;
   if (changes) delete [] changes;
 
   table = world.table;
@@ -50,6 +57,8 @@ World& World::operator=(const World& world) {
   changes = new bool [nr * nc];
   memcpy(state, world.state, nr * nc * sizeof(ElementID));
   memcpy(buffer, world.buffer, nr * nc * sizeof(ElementID));
+  memcpy(pressure, world.pressure, nr * nc * sizeof(int));
+  memcpy(pbuffer, world.pbuffer, nr * nc * sizeof(int));
   memcpy(changes, world.changes, nr * nc * sizeof(bool));
 
   return *this;
@@ -67,6 +76,14 @@ ElementID World::at(int r, int c) const {
 void World::set(int r, int c, ElementID id) {
   if (r < 0 || r >= nr || c < 0 || c >= nc) return;
   buffer[r * nc + c] = id;
+  pbuffer[r * nc + c] = elementAt(r, c).pressure;
+  changes[r * nc + c] = 1;
+}
+
+void World::set(int r, int c, ElementID id, int pressure) {
+  if (r < 0 || r >= nr || c < 0 || c >= nc) return;
+  buffer[r * nc + c] = id;
+  pbuffer[r * nc + c] = pressure;
   changes[r * nc + c] = 1;
 }
 
@@ -74,18 +91,25 @@ const Element& World::elementAt(int r, int c) const {
   return table->elements[at(r, c)];
 }
 
+int World::pressureAt(int r, int c) const {
+  return pressure[r * nc + c];
+}
+
 void World::clear() {
   memset(buffer, 0, sizeof(ElementID) * nr * nc);
+  memset(pbuffer, 0, sizeof(int) * nr * nc);
   flipBuffer();
 }
 
 void World::clearFloor() {
   memset(buffer + (nr - 1) * nc, 0, sizeof(ElementID) * nc);
+  memset(pbuffer + (nr - 1) * nc, 0, sizeof(int) * nc);
   flipBuffer();
 }
 
 void World::flipBuffer() {
   memcpy(state, buffer, nr * nc * sizeof(ElementID));
+  memcpy(pressure, pbuffer, nr * nc * sizeof(int));
   memset(changes, 0, sizeof(bool) * nr * nc);
 }
 
@@ -163,12 +187,13 @@ void World::iterate() {
 
 void World::save(const char* fn) const {
   FILE* fp = fopen(fn, "wb");
-  const char* str = "s2-0000";
+  const char* str = "s2-0001";
   fwrite(str, 1, strlen(str) + 1, fp);
   fwrite(&nr, sizeof(int), 1, fp);
   fwrite(&nc, sizeof(int), 1, fp);
   fwrite(&border, sizeof(ElementID), 1, fp);
   fwrite(state, sizeof(ElementID), nr * nc, fp);
+  fwrite(pressure, sizeof(int), nr * nc, fp);
   fclose(fp);
 }
 
@@ -176,7 +201,7 @@ int World::load(const char* fn) {
   FILE* fp = fopen(fn, "rb");
   if (!fp) return 1;
 
-  const char* str = "s2-0000";
+  const char* str = "s2-0001";
   char checkstr[8];
   fread(checkstr, 1, 8, fp);
   if (strcmp(str, checkstr)) {
@@ -194,6 +219,7 @@ int World::load(const char* fn) {
 
   fread(&border, sizeof(ElementID), 1, fp);
   fread(buffer, sizeof(ElementID), nr * nc, fp);
+  fread(pbuffer, sizeof(int), nr * nc, fp);
 
   fclose(fp);
 
