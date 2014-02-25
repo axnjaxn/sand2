@@ -40,7 +40,7 @@ element_defs:	{$$ = NULL;}
 properties:	{$$ = defaultPropertyTable();}
 	|	COLOR NUMBER COMMA NUMBER COMMA NUMBER properties {$$ = $7; $$->argb = toARGB($2, $4, $6);}
 	|	DENSITY NUMBER properties {$$ = $3; $$->density = $2; $$->fixed = 0;}
-	|	PRESSURE NUMBER properties {$$ = $3; $$->pressure = (int)($2);}
+	|	PRESSURE NUMBER properties {$$ = $3; $$->pressure = $2;}
 	|	REACT IDENT COLON ptable properties {$$ = $5; $$->reactions = addList($2, $4, $$->reactions);}
 	| 	DECAY ptable properties {$$ = $3; if ($$->decay) yyerror("Multiple decays declared for element."); $$->decay = $2;}
 

@@ -22,7 +22,7 @@ S2List* addProperties(const char* str, struct _PropertyTable* prop, S2List* next
 struct _PropertyTable {
     float density;
     int fixed;
-    int pressure;
+    float pressure;
     unsigned int argb;
     struct _S2List* reactions; //List of lists
     struct _S2List* decay; //List of probabilities
