@@ -7,9 +7,37 @@ void World::react(int r0, int c0, int r1, int c1) {
   if (result != ProbList::none) set(r0, c0, result);
 }
 
-void World::decompress(int r0, int c0, int r1, int c1) {
-  if (pressureAt(r0, c0) > 1 && pressureAt(r1, c1) < 1)
-    set(r1, c1, at(r0, c0), 1);
+#include <cstdio>
+void World::decompress(int r, int c) { 
+  int R[9], C[9], n = 1;
+  R[0] = r;
+  C[0] = c;
+
+  float p = pressureAt(r, c);
+
+  for (int r1 = -1; r1 <= 1; r1++)
+    for (int c1 = -1; c1 <= 1; c1++)
+      if (pressureAt(r + r1, c + c1) == 0.0) {
+	R[n] = r + r1;
+	C[n] = c + c1;
+	n++;
+      }
+
+  if (n == 1)
+    for (int r1 = -1; r1 <= 1; r1++)
+      for (int c1 = -1; c1 <= 1; c1++)
+	if (pressureAt(r + r1, c + c1) <= 1.0 && at(r + r1, c + c1) == at(r, c)) {
+	  R[n] = r + r1;
+	  C[n] = c + c1;
+	  n++;
+	  p += pressureAt(r + r1, c + c1);
+	}
+
+  if (n > 1) {
+    p = p / n;
+    for (int i = 0; i < n; i++)
+      set(R[i], C[i], at(r, c), p);
+  }
 }
 
 void World::swap(int r0, int c0, int r1, int c1) {
@@ -103,6 +131,7 @@ const Element& World::elementAt(int r, int c) const {
 }
 
 float World::pressureAt(int r, int c) const {
+  if (r < 0 || r >= nr || c < 0 || c >= nc) return 1e99;
   return pressure[r * nc + c];
 }
 
@@ -129,14 +158,7 @@ void World::applyReaction() {
     for (int c = 0; c < nc; c++) {
       if (changed(r, c));
       else if (pressureAt(r, c) > 1) {
-	decompress(r, c, r + 1, c);
-	decompress(r, c, r - 1, c);
-	decompress(r, c, r, c - 1);
-	decompress(r, c, r, c + 1);
-	decompress(r, c, r + 1, c - 1);
-	decompress(r, c, r + 1, c + 1);
-	decompress(r, c, r - 1, c - 1);
-	decompress(r, c, r - 1, c + 1);
+	decompress(r, c);
       }
       else {	
 	react(r, c, r + 1, c);
@@ -164,7 +186,7 @@ void World::applyDecay() {
   ElementID result;
   for (int r = 0; r < nr; r++)
     for (int c = 0; c < nc; c++) {
-      if (changed(r, c) || pressureAt(r, c) > 1) continue;
+      if (changed(r, c) || pressureAt(r, c) > 1.0) continue;
       result = elementAt(r, c).decay.random();
       if (result != ProbList::none) set(r, c, result);
     }

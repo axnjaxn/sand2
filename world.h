@@ -6,7 +6,7 @@
 class World {
 protected:
   void react(int r0, int c0, int r1, int c1);
-  void decompress(int r0, int c0, int r1, int c1);
+  void decompress(int r, int c);
   void swap(int r0, int c0, int r1, int c1); 
 
 public:
