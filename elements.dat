@@ -1,17 +1,21 @@
-//elements2.dat
+//elements.dat
 //An example of how to define elements for Sand 2.0 by Brian Jackson
-//I've since extended the table
 
 //First, (optionally), you can put the names of elements you want to include in your menu
 //If you don't specify this, all elements you declare are automatically included
 //If you do specify a menu, *only* the specified elements can be drawn by the user
 //Also, this allows you to rearrange elements into whatever order you like
-menu Air, Wall, Sand, Water, Oil, Salt,
-     SaltWater, Plant, Wood, Fire, HiFire, Steam,
-     Torch, Spout, Napalm, CementPowder,
-     Ozone, MoltenMetal, HotMetal, Metal,
-     Acetylene, AcetyleneEmitter, Snow, Fuse, 
-     Radiation, HiPressureSteam
+menu 
+     //The first ten elements get mapped to keys 0-9
+     Air, Wall, Sand, Water, Oil, Salt,
+     SaltWater, Plant, Wood, Fire, 
+     //The rest can still be selected by using the arrow keys
+     HiFire, Snow, Steam, HiPressureSteam
+     Torch, Spout, 
+     Napalm, CementPowder,
+     Ozone, MoltenMetal, Metal,
+     Acetylene, AcetyleneEmitter, Fuse, 
+     Radiation
 
 
 //Each element starts with the keyword "element" and a (usually) capitalized name
@@ -20,17 +24,17 @@ menu Air, Wall, Sand, Water, Oil, Salt,
 //uninteresting
 
 //Each element can have the following properties:
-//color, density, react, decay
+//color, density, pressure, react, decay
 
 element Air
 	color 0.0, 0.0, 0.0 //Colors must be specified r, g, b in the range 0.0 - 1.0
-	density 0.0 //If density isn't specified, the element will be unaffected by gravity
-	pressure 0.0 //To allow high pressure elements to expand
+	density 0.0 //If density isn't specified, the element will be unaffected by gravity - otherwise heavy elements sink and light ones rise
+	pressure 0.0 //Certain elements can overwrite elements with a zero pressure. Default is pressure 1.0.
 	react Torch: Fire 1.0 //100% chance that air touching torch bursts into flames - effectively, torch spawns fire
 	react Spout: Water 1.0 //Same for spout and water
 	react Radiation: Radiation 1.0 //Same for radiation - it's self-propagating
 	react AcetyleneEmitter: Acetylene 1.0
-	react BurningWood: Fire 0.005
+	react BurningWood: Fire 0.005 //You can specify reactions that only happen with a certain probability per step of the in-game clock
 
 element Wall
 	color 0.75, 0.75, 0.75
@@ -39,7 +43,7 @@ element Wall
 
 element Sand 
 	color 1.0, 0.75, 0.25
-	density 2.0 //Density is arbitrary, but the denser elements seek the bottom
+	density 2.0
 	react Radiation: Radiation 1.0
 	react Fallout: Fallout 1.0
 
@@ -56,7 +60,7 @@ element Water
 element Oil
 	color 0.75, 0.25, 0.25
 	density 0.75
-	react Fire: Fire 0.5, HiFire 0.5
+	react Fire: Fire 0.5, HiFire 0.5 //This is an example of a reaction that has multiple possible outcomes, each with 50% chance.
 	react HiFire: Fire 0.5, HiFire 0.5
 	react Radiation: Radiation 1.0
 	react Fallout: Fallout 1.0
@@ -72,11 +76,11 @@ element Salt
 element SaltWater
 	color 0.25, 0.25, 0.75
 	density 1.0
-	react Fire: Salt 0.5, Water 0.5 //This is an example of multiple reactions - each one has a probability of 50%
+	react Fire: Salt 0.5, Water 0.5
 	react HiFire: Salt 0.5, Water 0.5
 	react Radiation: Radiation 1.0
 	react Fallout: Fallout 1.0
-	decay Salt 0.0001, Water 0.0001 //If the element decays (changes without needing to touch anything) it looks like this
+	decay Salt 0.0001, Water 0.0001 //If the element decays (changes without needing to touch anything) it looks like this.
 
 element Plant
 	color 0.0, 1.0, 0.0
@@ -127,6 +131,18 @@ element Snow
 	react Fallout: Fallout 1.0
 	decay Water 0.0001, BlowSnow 0.5
 
+//How about snow? This is a neat trick.  
+//I alternate between a air-density and a heavier-than-air element to make snow fall slower than other elements
+element BlowSnow
+	color 0.8, 0.8, 1.0
+	density 0.0
+	react Fire: Water 0.1
+	react HiFire: Steam 1.0
+	react Radiation: Radiation 1.0
+	react Fallout: Fallout 1.0
+	decay Snow 0.5
+
+//You'll notice that while Torch "spawns" fire, you don't do it by changing a property here - instead, it's a reaction of Air *to* Torch.
 element Torch
 	color 0.75, 0.0, 0.0
 	react HiFire: HiFire 1.0
@@ -167,8 +183,7 @@ element Fallout
 	color 0.0, 1.0, 1.0
 	decay Air 0.015
 
-//This allows me to create an upper atmosphere inert to many propagating elements
-
+//This element allows me to create an upper atmosphere inert to many propagating elements.
 element Ozone
 	color 0.125, 0.125, 0.25
 	density -5.0
@@ -180,8 +195,9 @@ element InvizOzone
 	react HiFire: Fire 0.5, HiFire 0.1
 	color 0.0, 0.0, 0.0
 
-//I like the idea of a metal, too
-
+//I like the idea of a metal, too. It works like this:
+// Molten Metal <-> Setting Molten Metal -> Hot Metal -> Metal
+//The smallest reaction supported is 1/32768, so I needed two elements to make it less than that.
 element SettingMoltenMetal
 	color 1.0, 0.625, 0.0
 	density 10.0
@@ -212,8 +228,6 @@ element Metal
 	react MoltenMetal: HotMetal 0.05
 	react HotMetal: HotMetal 0.001
 
-//Ooh, how about really hot fire?
-
 element HiFire
 	color 0.25, 1.0, 1.0
 	density -1.5
@@ -236,19 +250,7 @@ element AcetyleneEmitter
 	react Radiation: Radiation 1.0
 	react Fallout: Fallout 1.0
 
-// How about snow? This is a neat trick
-
-element BlowSnow
-	color 0.8, 0.8, 1.0
-	density 0.0
-	react Fire: Water 0.1
-	react HiFire: Steam 1.0
-	react Radiation: Radiation 1.0
-	react Fallout: Fallout 1.0
-	decay Snow 0.5
-
 // This is a slow-burning element
-
 element Fuse
 	color 0.125, 0.25, 0.25
 	react HiFire: Fire 0.5, LitFuse 0.5
@@ -260,6 +262,7 @@ element LitFuse
 	react Fallout: Fallout 1.0
 	decay Fire 0.02
 
+//This is an example of a high-pressure element.
 element HiPressureSteam
 	color 0.5, 0.5, 1.0
 	density -0.5
