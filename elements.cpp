@@ -19,6 +19,7 @@ Element::Element(const std::string& name) {
   this->name = name;
   fixed = 1;
   density = 1.0;
+  pressure = 1.0;
 }
 
 ElementTable::ElementTable(Sand2Spec* spec) {

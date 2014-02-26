@@ -1,4 +1,4 @@
-CFLAGS = -g -O3 -Wno-unused-result
+CFLAGS = -g -O3 -Wno-unused-result -DDEBUG 
 
 ifndef MINGW
 LFLAGS = -g `sdl2-config --libs` -lfl
@@ -49,5 +49,5 @@ clean:
 	rm -f sand2 *.o *~ \
 	sand2.lex.c sand2.tab.c sand2.tab.h
 
-run: sand2 elements2.dat
-	./sand2 elements2.dat
+run: sand2 elements.dat
+	./sand2 elements.dat
