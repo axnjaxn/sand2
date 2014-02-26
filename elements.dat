@@ -29,11 +29,11 @@ menu
 element Air
 	color 0.0, 0.0, 0.0 //Colors must be specified r, g, b in the range 0.0 - 1.0
 	density 0.0 //If density isn't specified, the element will be unaffected by gravity - otherwise heavy elements sink and light ones rise
-	pressure 0.0 //Certain elements can overwrite elements with a zero pressure. Default is pressure 1.0.
+	pressure 0.0 //Certain elements can overwrite elements with a zero pressure. Default is pressure 1.0. Elements can't decay or react until their pressure is equalized.
 	react Torch: Fire 1.0 //100% chance that air touching torch bursts into flames - effectively, torch spawns fire
 	react Spout: Water 1.0 //Same for spout and water
 	react Radiation: Radiation 1.0 //Same for radiation - it's self-propagating
-	react AcetyleneEmitter: Acetylene 1.0
+	react AcetyleneEmitter: HiPressureAcetylene 1.0
 	react BurningWood: Fire 0.005 //You can specify reactions that only happen with a certain probability per step of the in-game clock
 
 element Wall
@@ -237,13 +237,25 @@ element HiFire
 	react Fallout: Fallout 1.0
 	decay Fire 0.05
 
+element HiPressureFire
+	color 0.25, 1.0, 1.0
+	density -1.5
+	pressure 5.0
+	decay HiFire 1.0
+
 element Acetylene
 	color 0.0, 0.125, 0.0
 	density 0.0
 	react Radiation: Radiation 1.0
 	react Fallout: Fallout 1.0
-	react Hifire: HiFire 1.0
-	react Fire: HiFire 1.0
+	react Hifire: HiPressureFire 1.0
+	react Fire: HiPressureFire 1.0
+
+element HiPressureAcetylene
+	color 0.0, 0.125, 0.0
+	density 0.0
+	pressure 4.0
+	decay Acetylene 1.0
 
 element AcetyleneEmitter
 	color 0.4, 0.9, 0.0
@@ -267,4 +279,4 @@ element HiPressureSteam
 	color 0.5, 0.5, 1.0
 	density -0.5
 	pressure 64.0
-	decay Steam 1.0 //Elements can't decay or react until their pressure is equalized
+	decay Steam 1.0
