@@ -10,7 +10,7 @@ menu
      Air, Wall, Sand, Water, Oil, Salt,
      SaltWater, Plant, Wood, Fire, 
      //The rest can still be selected by using the arrow keys
-     HiFire, Snow, Steam, HiPressureSteam
+     HiFire, Snow, Steam, HiPressureSteam,
      Torch, Spout, 
      Napalm, CementPowder,
      Ozone, MoltenMetal, Metal,
