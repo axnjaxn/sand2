@@ -151,6 +151,14 @@ int main(int argc, char* argv[]) {
 	  slowmo = !slowmo;
 	  osd.setTextf("Slowmo: %s", (slowmo)? "on" : "off");
 	  break;
+	case SDLK_t:
+	  paused = 1;
+#ifdef DEBUG
+	  printf("Step\n");
+#endif
+	  world.iterate();
+	  if (!floor) world.clearFloor();
+	  break;
 	case SDLK_UP:
 	  radius++; 
 	  osd.setTextf("Radius: %d", radius); 

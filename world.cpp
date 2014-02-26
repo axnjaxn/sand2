@@ -65,6 +65,7 @@ World::World(ElementTable* table, int nr, int nc) {
 
 World::World(const World& world) {
   state = buffer = NULL;
+  pressure = pbuffer = NULL;
   changes = NULL;
   *this = world;
 }
@@ -114,18 +115,13 @@ ElementID World::at(int r, int c) const {
 void World::set(int r, int c, ElementID id) {
   if (r < 0 || r >= nr || c < 0 || c >= nc) return;
   buffer[r * nc + c] = id;
-  setPressure(r, c, elementAt(r, c).pressure);
+  pbuffer[r * nc + c] = table->elements[id].pressure;
   changes[r * nc + c] = 1;
 }
 
 void World::set(int r, int c, ElementID id, float pressure) {
   if (r < 0 || r >= nr || c < 0 || c >= nc) return;
   buffer[r * nc + c] = id;
-  setPressure(r, c, pressure);
-  changes[r * nc + c] = 1;
-}
-
-void World::setPressure(int r, int c, float pressure) {
   pbuffer[r * nc + c] = pressure;
   changes[r * nc + c] = 1;
 }
@@ -160,7 +156,7 @@ void World::flipBuffer() {
 void World::applyReaction() {
   for (int r = 0; r < nr; r++)
     for (int c = 0; c < nc; c++) {
-      if (changed(r, c));
+      if (changed(r, c)) continue;
       else if (pressureAt(r, c) > 1) decompress(r, c);
       else {	
 	react(r, c, r + 1, c);

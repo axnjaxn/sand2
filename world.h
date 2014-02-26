@@ -27,7 +27,6 @@ public:
   ElementID at(int r, int c) const;
   void set(int r, int c, ElementID id);
   void set(int r, int c, ElementID id, float pressure);
-  void setPressure(int r, int c, float pressure);
   const Element& elementAt(int r, int c) const;
   float pressureAt(int r, int c) const;
 
