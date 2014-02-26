@@ -18,7 +18,7 @@ ElementID ProbList::random() const {
 Element::Element(const std::string& name) {
   this->name = name;
   fixed = 1;
-  density = 0.0;
+  density = 1.0;
 }
 
 ElementTable::ElementTable(Sand2Spec* spec) {
@@ -29,6 +29,7 @@ ElementTable::ElementTable(Sand2Spec* spec) {
    * Step 1: Get the element names (so that they can be bound)
    */
   elements.push_back(Element("Air"));
+  elements[0].density = 0.0;
   elements.push_back(Element("Wall"));
   for (S2List* lst = spec->properties; lst; lst = lst->next) {
     name = std::string(lst->str);

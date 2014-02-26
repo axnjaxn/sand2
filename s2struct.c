@@ -41,7 +41,7 @@ PropertyTable* defaultPropertyTable() {
     PropertyTable* table = malloc(sizeof(PropertyTable));
     table->density = 0.0;
     table->fixed = 1;
-    table->pressure = 0;
+    table->pressure = 1.0;
     table->argb = 0xFFFFFFFF;
     return table;
 }
