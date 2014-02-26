@@ -43,6 +43,10 @@ public:
 
   void save(const char* fn) const;
   int load(const char* fn); //Returns 0 on successful load
+
+  void drawCircle(ElementID id, int x, int y, int r);
+  void drawLine(ElementID id, int x0, int y0, int x1, int y1, int r);
+  void drawRect(ElementID id, int x0, int y0, int x1, int y1);
 };
 
 #endif

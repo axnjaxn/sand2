@@ -13,38 +13,6 @@ extern "C" {
 
 #define TITLE "Sand2 by Brian Jackson"
 
-void drawElement(World& world, ElementID mode, int x, int y, int radius) {
-  for (int bw, by = -radius; by <= radius; by++) {
-    bw = (int)(sqrt(radius * radius - by * by) - 0.75);
-    for (int bx = -bw; bx <= bw; bx++)
-      world.set(by + y, bx + x, mode);
-  }
-}
-
-void drawElement(World& world, ElementID mode, int x0, int y0, int x1, int y1, int radius) {
-  float dx = x1 - x0;
-  float dy = y1 - y0;
-  float d = sqrt(dx * dx + dy * dy);
-  if (d == 0.0) d = 1;
-  dx /= d;
-  dy /= d;
-
-  for (int i = 0, x, y; i <= d; i++) {
-    x = (int)(x0 + i * dx + 0.5);
-    y = (int)(y0 + i * dy + 0.5);
-    drawElement(world, mode, x, y, radius);
-  }    
-}
-
-void drawElementRect(World& world, ElementID mode, int x0, int y0, int x1, int y1) {
-  int t;
-  if (y0 > y1) {t = y0; y0 = y1; y1 = t;}
-  if (x0 > x1) {t = x0; x0 = x1; x1 = t;}
-  for (int y = y0; y <= y1; y++)
-    for (int x = x0; x <= x1; x++)
-      world.set(y, x, mode);
-}
-
 int main(int argc, char* argv[]) {
   const int w = 640, h = 400, sc = 2;
 
@@ -112,8 +80,8 @@ int main(int argc, char* argv[]) {
       }
       else if (event.type == SDL_MOUSEBUTTONUP) {
 	if (mousedown == 2) {
-	  if (drawmode) drawElementRect(world, mode, mx, my, nx, ny);
-	  else drawElement(world, mode, mx, my, nx, ny, radius);
+	  if (drawmode) world.drawRect(mode, mx, my, nx, ny);
+	  else world.drawLine(mode, mx, my, nx, ny, radius);
 	  world.flipBuffer();
 	}
 	mousedown = 0;
@@ -200,7 +168,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (mousedown == 1) {
-      drawElement(world, mode, mx, my, nx, ny, radius);
+      world.drawLine(mode, mx, my, nx, ny, radius);
       world.flipBuffer();
       nx = mx;
       ny = my;

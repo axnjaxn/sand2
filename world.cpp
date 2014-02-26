@@ -1,6 +1,7 @@
 #include "world.h"
 #include <cstring>
 #include <cstdlib>
+#include <cmath>
 
 void World::react(int r0, int c0, int r1, int c1) {
   ElementID result = elementAt(r0, c0).reactions[at(r1, c1)].random();
@@ -269,4 +270,36 @@ int World::load(const char* fn) {
   flipBuffer();
 
   return 0;
+}
+
+void World::drawCircle(ElementID id, int x, int y, int r) {
+  for (int bw, by = -r; by <= r; by++) {
+    bw = (int)(sqrt(r * r - by * by) - 0.75);
+    for (int bx = -bw; bx <= bw; bx++)
+      set(by + y, bx + x, id);
+  }
+}
+
+void World::drawLine(ElementID id, int x0, int y0, int x1, int y1, int r) {
+  float dx = x1 - x0;
+  float dy = y1 - y0;
+  float d = sqrt(dx * dx + dy * dy);
+  if (d == 0.0) d = 1;
+  dx /= d;
+  dy /= d;
+
+  for (int i = 0, x, y; i <= d; i++) {
+    x = (int)(x0 + i * dx + 0.5);
+    y = (int)(y0 + i * dy + 0.5);
+    drawCircle(id, x, y, r);
+  }    
+}
+
+void World::drawRect(ElementID id, int x0, int y0, int x1, int y1) {
+  int t;
+  if (y0 > y1) {t = y0; y0 = y1; y1 = t;}
+  if (x0 > x1) {t = x0; x0 = x1; x1 = t;}
+  for (int y = y0; y <= y1; y++)
+    for (int x = x0; x <= x1; x++)
+      set(y, x, id);
 }
