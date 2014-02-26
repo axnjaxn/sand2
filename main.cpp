@@ -14,13 +14,51 @@ extern "C" {
 #define TITLE "Sand2 by Brian Jackson"
 
 int main(int argc, char* argv[]) {
-  const int w = 640, h = 400, sc = 2;
+  /*
+   * CLI args and global configuration
+   */
+  int nr = 400, nc = 640;//Number of rows (height) and columns (width)
+  int sc = 2; //Display scale (in pixels)
+  std::string element_filename = "elements.dat";
+  bool setfile = 0, no_osd = 0;
+
+  argc--;
+  argv++;
+  for (int i = 0; i < argc;) {
+    if (!strcmp(argv[i], "--rows")) {
+      sscanf(argv[i + 1], "%d", &nr);
+      i += 2;
+    }
+    else if (!strcmp(argv[i], "--cols")) {
+      sscanf(argv[i + 1], "%d", &nc);
+      i += 2;
+    }
+    else if (!strcmp(argv[i], "--scale")) {
+      sscanf(argv[i + 1], "%d", &sc);
+      i += 2;
+    }
+    else if (!strcmp(argv[i], "--no-osd")) {
+      no_osd = 1;
+      i++;
+    }
+    else if (!setfile) {
+      element_filename = argv[i++];
+      setfile = 1;
+    }
+    else {
+      printf("Invalid command-line argument: \"%s\".\n", argv[i]);
+      return 1;
+    }
+  }
+  
+  extern FILE* yyin;
+  yyin = fopen(element_filename.c_str(), "r");
+
+  /*
+   * Parsing element table
+   */
 
   srand(time(NULL));
-
-  extern FILE* yyin;
-  if (argc < 2) return 0;
-  yyin = fopen(argv[1], "r");
 
   extern Sand2Spec* gspec;
   yyparse();
@@ -28,9 +66,16 @@ int main(int argc, char* argv[]) {
   ElementTable table(gspec);
   destroySpec(gspec);
 
-  World world(&table, h, w);
+  /*
+   * Initialize world
+   */
 
-  //Initialize SDL and catch init errors
+  World world(&table, nr, nc);
+
+  /*
+   * Initialize SDL 2.0
+   */
+
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     printf("Fatal error initializing SDL");
     return 1;
@@ -40,29 +85,36 @@ int main(int argc, char* argv[]) {
   SDL_Window* window = SDL_CreateWindow(TITLE,
 					SDL_WINDOWPOS_CENTERED,
 					SDL_WINDOWPOS_CENTERED,
-					w * sc, h * sc,
+					nc * sc, nr * sc,
 					0);
   SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
   SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
-  PixelRenderer* px = new PixelRenderer(renderer, w, h);
-  SDL_RenderSetLogicalSize(renderer, w, h);
+  /*
+   * Set up PixelRender and On Screen Display
+   */
+
+  PixelRenderer* px = new PixelRenderer(renderer, nc, nr);
+  SDL_RenderSetLogicalSize(renderer, nc, nr);
   SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
   SDL_RenderClear(renderer);
 
   OSD osd;
+  if (no_osd) osd.setVisible(0);
   osd.enableFade();
   osd.setTime(5000);
   osd.setText("Arrows to change element / size");
   osd.setTime(3000);
   const int osd_time = 2000;
   
+  /* 
+   * Set up draw tools and begin main loop
+   */
+
   int radius = 3, mx, my, nx, ny;
   int modeIndex = (table.menu.size() > 2)? 2 : table.menu.size() - 1;
   ElementID mode = table.menu[modeIndex];
-
   int drawmode = 0;
-
   SDL_Event event;
   bool exitflag = 0, paused = 0, floor = 1, modeflag = 0, slowmo = 0;
   int mousedown = 0;
@@ -121,9 +173,6 @@ int main(int argc, char* argv[]) {
 	  break;
 	case SDLK_t:
 	  paused = 1;
-#ifdef DEBUG
-	  printf("Step\n");
-#endif
 	  world.iterate();
 	  if (!floor) world.clearFloor();
 	  break;
@@ -168,7 +217,10 @@ int main(int argc, char* argv[]) {
     }
 
     if (mousedown == 1) {
-      world.drawLine(mode, mx, my, nx, ny, radius);
+      if (SDL_GetModState() & KMOD_CTRL)
+	world.set(my, mx, mode);
+      else
+	world.drawLine(mode, mx, my, nx, ny, radius);
       world.flipBuffer();
       nx = mx;
       ny = my;

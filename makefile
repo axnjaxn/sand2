@@ -50,4 +50,4 @@ clean:
 	sand2.lex.c sand2.tab.c sand2.tab.h
 
 run: sand2 elements.dat
-	./sand2 elements.dat
+	./sand2
