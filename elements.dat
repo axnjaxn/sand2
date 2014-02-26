@@ -261,7 +261,7 @@ element LitFuse
 	decay Fire 0.02
 
 element HiPressureSteam
-	color 0.9, 0.0, 0.0
-	density 0.0
+	color 0.25, 0.25, 0.75
+	density -0.5
 	pressure 64.0
-	decay Steam 1.0
+	decay Steam 1.0 //Elements can't decay or react until their pressure is equalized
