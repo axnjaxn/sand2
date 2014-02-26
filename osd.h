@@ -11,7 +11,7 @@ public:
   std::string text;
   Uint32 start, end, fadetime;
   Uint8 r, g, b;
-  bool fade, vanish;
+  bool fade, vanish, enabled;
 
   OSD();
 
@@ -19,6 +19,7 @@ public:
   void setTextf(const char* str, ...);
   void setColor(Uint8 r, Uint8 g, Uint8 b);
   void setTime(Uint32 fadetime);
+  void setVisible(bool enable = 1);
   void enableFade(bool enable = 1);
   void enableVanish(bool enable = 1);
 

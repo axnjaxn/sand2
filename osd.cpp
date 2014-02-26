@@ -22,6 +22,8 @@ void OSD::setColor(Uint8 r, Uint8 g, Uint8 b) {this->r = r; this->g = g; this->b
 
 void OSD::setTime(Uint32 fadetime) {this->fadetime = fadetime;}
 
+void OSD::setVisible(bool enable) {enabled = enable;}
+
 void OSD::enableFade(bool enable) {fade = enable;}
 
 void OSD::enableVanish(bool enable) {vanish = enable;}
@@ -31,6 +33,8 @@ bool OSD::isVisible() const {
 }
 
 void OSD::render(SDL_Renderer* render, int x, int y, int scale) const {
+  if (!enabled) return;
+
   Uint32 t = SDL_GetTicks();
   if (t >= end) return;
 
