@@ -29,7 +29,6 @@ void World::decompress(int r, int c) {
     for (int r1 = -1; r1 <= 1; r1++)
       for (int c1 = -1; c1 <= 1; c1++)
 	if (!changed(r + r1, c + c1)
-	    && pressureAt(r + r1, c + c1) <= 1.0 
 	    && at(r + r1, c + c1) == at(r, c)) {
 	  R[n] = r + r1;
 	  C[n] = c + c1;
