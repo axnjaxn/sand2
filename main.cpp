@@ -50,6 +50,8 @@ void readMacro(World& world, const char* macro) {
   }
 
   fclose(fp);
+
+  world.flipBuffer();
 }
 
 void chooseMacro(World& world) {
