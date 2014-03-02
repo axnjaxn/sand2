@@ -201,7 +201,6 @@ int main(int argc, char* argv[]) {
 	  if (world.load("sand2.sav")) osd.setText("Could not load sand2.sav!");
 	  else osd.setText("World loaded from sand2.sav!");
 	  break;	  
-	case SDLK_ESCAPE: exitflag = 1; break;
 	case SDLK_BACKSPACE: world.clear(); osd.setText("World cleared!"); break;
 	case SDLK_SPACE: 
 	  paused = !paused;
@@ -296,17 +295,22 @@ int main(int argc, char* argv[]) {
 
     osd.render(renderer, 0, 0, 2);
     if (mousedown == 2) {
-      SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
       if (!drawmode) {
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 	SDL_RenderDrawLine(renderer, mx, my, nx, ny);
 	SDL_RenderDrawLine(renderer, mx - radius, my, mx + radius, my);
 	SDL_RenderDrawLine(renderer, mx, my - radius, mx, my + radius);
       }
       else {
-	SDL_RenderDrawLine(renderer, mx, my, nx, my);
-	SDL_RenderDrawLine(renderer, nx, my, nx, ny);
-	SDL_RenderDrawLine(renderer, nx, ny, mx, ny);
-	SDL_RenderDrawLine(renderer, mx, ny, mx, my);
+	SDL_Rect rect;
+	rect.x = (mx > nx)? nx : mx;
+	rect.y = (my > ny)? ny : my;
+	rect.w = (mx > nx)? mx - nx : nx - mx;
+	rect.h = (my > ny)? my - ny : ny - my;
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	SDL_RenderDrawRect(renderer, &rect);
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 128);
+	SDL_RenderFillRect(renderer, &rect);
       }
     }
 
