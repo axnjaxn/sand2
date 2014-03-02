@@ -305,8 +305,8 @@ int main(int argc, char* argv[]) {
 	SDL_Rect rect;
 	rect.x = (mx > nx)? nx : mx;
 	rect.y = (my > ny)? ny : my;
-	rect.w = (mx > nx)? mx - nx : nx - mx;
-	rect.h = (my > ny)? my - ny : ny - my;
+	rect.w = (mx > nx)? mx - nx + 1: nx - mx + 1;
+	rect.h = (my > ny)? my - ny + 1: ny - my + 1;
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 	SDL_RenderDrawRect(renderer, &rect);
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 128);
