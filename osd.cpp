@@ -9,7 +9,7 @@
 
 BBC_Font OSD::font;
 
-OSD::OSD() {start = end = 0; setColor(255, 255, 255); setTime(3000); fade = vanish = 0;}
+OSD::OSD() {start = end = 0; setColor(255, 255, 255); setTime(3000); fade = vanish = 0; enabled = 1;}
 
 void OSD::setText(const std::string& text) {
   this->text = text;
