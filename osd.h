@@ -1,3 +1,10 @@
+/*
+ * osd.h
+ * On Screen Display by Brian Jackson
+ * Developed as part of BlameGear: Brian's Lame Game Gear Emulator
+ * Last updated: 3 March 2014
+ */
+
 #ifndef _BPJ_OSD_H
 #define _BPJ_OSD_H
 
@@ -14,9 +21,9 @@ public:
   bool fade, vanish, enabled;
 
   OSD();
-
-  void setText(const std::string& text);
-  void setTextf(const char* str, ...);
+  
+  virtual void setText(const std::string& text);
+  virtual void setTextf(const char* str, ...);
   void setColor(Uint8 r, Uint8 g, Uint8 b);
   void setTime(Uint32 fadetime);
   void setVisible(bool enable = 1);
@@ -24,7 +31,8 @@ public:
   void enableVanish(bool enable = 1);
 
   bool isVisible() const;
-  void render(SDL_Renderer* render, int x, int y, int scale = 1) const;
+  
+  virtual void render(SDL_Renderer* render, int x, int y, int scale = 1) const;
 };
 
 #endif

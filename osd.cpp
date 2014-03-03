@@ -1,3 +1,10 @@
+/*
+ * osd.cpp
+ * On Screen Display by Brian Jackson
+ * Developed as part of BlameGear: Brian's Lame Game Gear Emulator
+ * Last updated: 3 March 2014
+ */
+
 #include "osd.h"
 
 BBC_Font OSD::font;
