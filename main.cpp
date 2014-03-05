@@ -283,7 +283,7 @@ int main(int argc, char* argv[]) {
       ny = my;
     } 
  
-    if (!paused) {
+    if (!paused && !(slowmo && mousedown)) {
       world.iterate();
       if (!floor) world.clearFloor();
     }
@@ -316,7 +316,7 @@ int main(int argc, char* argv[]) {
 
     SDL_RenderPresent(renderer);
 
-    if (slowmo) SDL_Delay(100);
+    if (slowmo && !mousedown) SDL_Delay(100);
     else SDL_Delay(5);
   }
 
