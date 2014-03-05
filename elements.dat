@@ -15,7 +15,7 @@ menu
      Napalm, CementPowder,
      Ozone, MoltenMetal, Metal,
      Acetylene, AcetyleneEmitter, Fuse, 
-     Radiation
+     AntiLife, Radiation
 
 
 //Each element starts with the keyword "element" and a (usually) capitalized name
@@ -35,6 +35,7 @@ element Air
 	react Radiation: Radiation 1.0 //Same for radiation - it's self-propagating
 	react AcetyleneEmitter: HiPressureAcetylene 1.0
 	react BurningWood: Fire 0.005 //You can specify reactions that only happen with a certain probability per step of the in-game clock
+	react AntiLife: AntiLife 1.0
 
 element Wall
 	color 0.75, 0.75, 0.75
@@ -46,16 +47,20 @@ element Sand
 	density 2.0
 	react Radiation: Radiation 1.0
 	react Fallout: Fallout 1.0
+	react AntiLife: AntiLifeGlitter 1.0
+	react AntiLifeGlittter: AntiLifeGlitter 1.0
 
 element Water
 	color 0.0, 0.0, 1.0
 	density 1.0
-	react Salt: Saltwater 0.1
+	react Salt: SaltWater 0.1
 	react Plant: Plant 1.0
 	react Fire: Steam 0.8
 	react Napalm: Fire 1.0
 	react Radiation: Radiation 1.0
 	react Fallout: Fallout 1.0
+	react AntiLife: Air 1.0
+	react AntiLifeGlitter: Air 1.0
 
 element Oil
 	color 0.75, 0.25, 0.25
@@ -68,10 +73,12 @@ element Oil
 element Salt
 	color 1.0, 1.0, 1.0
 	density 1.5
-	react Water: Saltwater 0.2
+	react Water: SaltWater 0.2
 	react Fire: Air 0.5
 	react Radiation: Radiation 1.0
 	react Fallout: Fallout 1.0
+	react AntiLife: AntiLifeGlitter 1.0
+	react AntiLifeGlittter: AntiLifeGlitter 1.0
 
 element SaltWater
 	color 0.25, 0.25, 0.75
@@ -89,6 +96,8 @@ element Plant
 	react Fire: Fire 1.0
 	react HiFire: Fire 1.0
 	react Napalm: Fire 1.0
+	react AntiLife: AntiLife 1.0
+	react AntiLifeGlitter: AntiLife 1.0
 	
 element Wood
 	color 0.75, 0.75, 0.0
@@ -280,3 +289,14 @@ element HiPressureSteam
 	density -0.5
 	pressure 64.0
 	decay Steam 1.0
+
+element AntiLife
+	color 0.0, 0.2, 0.0
+	decay AntiLifeGlitter 0.5
+	react Wood: Fuse 1.0
+	react Water: AntiLifeGlitter 1.0
+
+element AntiLifeGlitter
+	color 0.0, 0.2, 0.0
+	react Wood: Fuse 1.0
+	decay Air 0.015
