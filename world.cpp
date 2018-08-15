@@ -1,4 +1,5 @@
 #include "world.h"
+#include <thread>
 #include <cstring>
 #include <cstdlib>
 #include <cmath>
@@ -153,12 +154,12 @@ void World::flipBuffer() {
   memset(changes, 0, sizeof(bool) * nr * nc);
 }
 
-void World::applyReaction() {
-  for (int r = 0; r < nr; r++)
+void World::applyReaction(int rstart, int rend) {
+  for (int r = rstart; r < rend; r++)
     for (int c = 0; c < nc; c++) {
       if (changed(r, c)) continue;
       else if (pressureAt(r, c) > 1) decompress(r, c);
-      else {	
+      else {
 	react(r, c, r + 1, c);
 	if (changed(r, c)) continue;
 	react(r, c, r - 1, c);
@@ -176,19 +177,53 @@ void World::applyReaction() {
 	react(r, c, r - 1, c + 1);
       }
     }
+}
 
+void World::applyReaction() {
+  int nthreads = std::thread::hardware_concurrency();
+  int rowsPerThread = (int)ceil((float)nr / nthreads);
+
+  auto tfn = [this](int r0, int r1) {this->applyReaction(r0, r1);};
+
+  std::vector<std::thread> T;
+  for (int i = 0, r0 = 0, r1; i < nthreads; i++) {
+    r1 = r0 + rowsPerThread;
+    if (r1 > nr) r1 = nr;
+    T.push_back(std::thread(tfn, r0, r1));
+    r0 = r1;
+  }
+
+  for (int i = 0; i < T.size(); i++) T[i].join();
   flipBuffer();
 }
 
-void World::applyDecay() {
+void World::applyDecay(int rstart, int rend) {
   ElementID result;
-  for (int r = 0; r < nr; r++)
+  for (int r = rstart; r < rend; r++)
     for (int c = 0; c < nc; c++) {
       if (changed(r, c) || pressureAt(r, c) > 1.0) continue;
       result = elementAt(r, c).decay.random();
       if (result != ProbList::none) set(r, c, result);
     }
 
+  flipBuffer();
+}
+
+void World::applyDecay() {
+  int nthreads = std::thread::hardware_concurrency();
+  int rowsPerThread = (int)ceil((float)nr / nthreads);
+
+  auto tfn = [this](int r0, int r1) {this->applyDecay(r0, r1);};
+
+  std::vector<std::thread> T;
+  for (int i = 0, r0 = 0, r1; i < nthreads; i++) {
+    r1 = r0 + rowsPerThread;
+    if (r1 > nr) r1 = nr;
+    T.push_back(std::thread(tfn, r0, r1));
+    r0 = r1;
+  }
+
+  for (int i = 0; i < T.size(); i++) T[i].join();
   flipBuffer();
 }
 

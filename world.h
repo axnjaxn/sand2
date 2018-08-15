@@ -7,7 +7,13 @@ class World {
 protected:
   void react(int r0, int c0, int r1, int c1);
   void decompress(int r, int c);
-  void swap(int r0, int c0, int r1, int c1); 
+  void swap(int r0, int c0, int r1, int c1);
+
+  void applyReaction(int rstart, int rend);
+  void applyReaction();
+  void applyDecay(int rstart, int rend);
+  void applyDecay();
+  void applyShift();
 
 public:
   ElementTable* table;
@@ -35,10 +41,6 @@ public:
   
   void flipBuffer();
 
-  void applyReaction();
-  void applyDecay();
-  void applyShift();
-  
   void iterate();
 
   void save(const char* fn) const;

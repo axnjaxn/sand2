@@ -224,6 +224,13 @@ int main(int argc, char* argv[]) {
 	  SDL_RenderPresent(renderer);
 	  break;
 #endif
+	case SDLK_r:
+	  //This is just to get a bunch of things on screen to test them
+	  slowmo = false;
+	  for (int r = 0; r < world.nr; r++)
+	    for (int c = 0; c < world.nc; c++)
+	      world.set(r, c, rand() % world.table->elements.size());
+	  break;
 	case SDLK_s:
 	  slowmo = !slowmo;
 	  osd.setTextf("Slowmo: %s", (slowmo)? "on" : "off");
@@ -317,11 +324,9 @@ int main(int argc, char* argv[]) {
     SDL_RenderPresent(renderer);
 
     if (slowmo && !mousedown) SDL_Delay(100);
-    else SDL_Delay(5);
   }
 
   delete px;
 
   return 0;
 }
-
