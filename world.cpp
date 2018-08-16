@@ -180,7 +180,7 @@ void World::applyReaction(int rstart, int rend) {
 }
 
 void World::applyReaction() {
-  int nthreads = std::thread::hardware_concurrency();
+  int nthreads = multiThreaded? std::thread::hardware_concurrency() : 1;
   int rowsPerThread = (int)ceil((float)nr / nthreads);
 
   auto tfn = [this](int r0, int r1) {this->applyReaction(r0, r1);};
@@ -210,7 +210,7 @@ void World::applyDecay(int rstart, int rend) {
 }
 
 void World::applyDecay() {
-  int nthreads = std::thread::hardware_concurrency();
+  int nthreads = multiThreaded? std::thread::hardware_concurrency() : 1;
   int rowsPerThread = (int)ceil((float)nr / nthreads);
 
   auto tfn = [this](int r0, int r1) {this->applyDecay(r0, r1);};
@@ -231,27 +231,54 @@ inline float uniform() {return (rand() & 0x7FFF) / 32768.0;}
 
 void World::applyShift() {
   const float pshift = 0.25;
-  
-  for (int r = 0; r < nr; r++)
-    for (int c = 0; c < nc - 1; c++) {
-      if (changed(r, c) || elementAt(r, c).fixed || changed(r, c + 1) || elementAt(r, c + 1).fixed) 
-	continue;
-      else if (uniform() < pshift)
-	swap(r, c, r, c + 1);
-    }
 
+  int nthreads = multiThreaded? std::thread::hardware_concurrency() : 1;
+  int rowsPerThread = (int)ceil((float)nr / nthreads);
+
+  auto tfn = [this, pshift](int r0, int r1) {
+    for (int r = r0; r < r1; r++)
+      for (int c = 0; c < nc - 1; c++) {
+	if (changed(r, c) || elementAt(r, c).fixed || changed(r, c + 1) || elementAt(r, c + 1).fixed)
+	  continue;
+	else if (uniform() < pshift)
+	  swap(r, c, r, c + 1);
+      }
+  };
+
+  std::vector<std::thread> T;
+  for (int i = 0, r0 = 0, r1; i < nthreads; i++) {
+    r1 = r0 + rowsPerThread;
+    if (r1 > nr) r1 = nr;
+    T.push_back(std::thread(tfn, r0, r1));
+    r0 = r1;
+  }
+
+  for (int i = 0; i < T.size(); i++) T[i].join();
   flipBuffer();
 
-  for (int r = 0; r < nr - 1; r++)
-    for (int c = 0; c < nc; c++) {
-      if (changed(r, c) || elementAt(r, c).fixed || changed(r + 1, c) || elementAt(r + 1, c).fixed) 
-	continue;
-      else if (elementAt(r, c).density > elementAt(r + 1, c).density)
-	swap(r, c, r + 1, c);
-      else if (elementAt(r, c).density == elementAt(r + 1, c).density && uniform() < pshift)
-	swap(r, c, r + 1, c);
-    }
+  int colsPerThread = (int)ceil((float)nc / nthreads);
 
+  auto tfn2 = [this, pshift](int c0, int c1) {
+    for (int r = 0; r < nr - 1; r++)
+      for (int c = c0; c < c1; c++) {
+	if (changed(r, c) || elementAt(r, c).fixed || changed(r + 1, c) || elementAt(r + 1, c).fixed)
+	  continue;
+	else if (elementAt(r, c).density > elementAt(r + 1, c).density)
+	  swap(r, c, r + 1, c);
+	else if (elementAt(r, c).density == elementAt(r + 1, c).density && uniform() < pshift)
+	  swap(r, c, r + 1, c);
+      }
+  };
+
+  T.clear();
+  for (int i = 0, c0 = 0, c1; i < nthreads; i++) {
+    c1 = c0 + colsPerThread;
+    if (c1 > nc) c1 = nc;
+    T.push_back(std::thread(tfn2, c0, c1));
+    c0 = c1;
+  }
+
+  for (int i = 0; i < T.size(); i++) T[i].join();
   flipBuffer();
 }
 

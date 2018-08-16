@@ -23,6 +23,8 @@ public:
   float *pressure, *pbuffer;
   bool* changes;
 
+  bool multiThreaded = false;
+
   World(ElementTable* table, int nr, int nc);
   World(const World& world);
   ~World();

@@ -68,8 +68,8 @@ int main(int argc, char* argv[]) {
   /*
    * CLI args and global configuration
    */
-  int nr = 400, nc = 640;//Number of rows (height) and columns (width)
-  int sc = 2; //Display scale (in pixels)
+  int nr = 600, nc = 800;//Number of rows (height) and columns (width)
+  int sc = 1; //Display scale (in pixels)
   std::string element_filename = "elements.dat";
   bool setfile = 0, no_osd = 0;
 
@@ -234,6 +234,10 @@ int main(int argc, char* argv[]) {
 	case SDLK_s:
 	  slowmo = !slowmo;
 	  osd.setTextf("Slowmo: %s", (slowmo)? "on" : "off");
+	  break;
+	case SDLK_n:
+	  world.multiThreaded = !world.multiThreaded;
+	  osd.setTextf("Multi-threading: %s", (world.multiThreaded)? "on" : "off");
 	  break;
 	case SDLK_t:
 	  paused = 1;
