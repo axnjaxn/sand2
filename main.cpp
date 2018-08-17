@@ -13,57 +13,6 @@ extern "C" {
 
 #define TITLE "Sand2 by Brian Jackson"
 
-#ifdef DEBUG
-void readMacro(World& world, const char* macro) {
-  FILE* fp = fopen(macro, "r");
-  if (!fp) return;
-  
-  ElementTable* table = world.table;
-
-  char buf[256];
-  while (!feof(fp)) {
-    fscanf(fp, "%s", buf);
-    if (!strcmp(buf, "done")) break;
-    else if (!strcmp(buf, "rect")) {
-      ElementID id;
-      int r0, c0, r1, c1;
-      fscanf(fp, "%s %d %d %d %d", buf, &r0, &c0, &r1, &c1);
-      id = table->getIndex(buf);
-      world.drawRect(id, c0, r0, c1, r1);
-    }
-    else if (!strcmp(buf, "cells")) {
-      int r, c;
-      fscanf(fp, "%d %d", &r, &c);
-
-      ElementID id;
-      fscanf(fp, "%s", buf);
-      while (strcmp(buf, "done")) {
-	id = table->getIndex(buf);
-	fscanf(fp, "%s", buf);
-	world.set(r, c, id);
-	if (++c > world.nc) {
-	  r += c / world.nc;
-	  c = c % world.nc;
-	}
-      }
-    }
-  }
-
-  fclose(fp);
-
-  world.flipBuffer();
-}
-
-void chooseMacro(World& world) {
-  char fn[256];
-  printf("Enter a macro filename: ");
-  fflush(0);
-  scanf("%s", fn);
-  readMacro(world, fn);
-  printf("Done.\n");
-}
-#endif
-
 int main(int argc, char* argv[]) {
   /*
    * CLI args and global configuration
@@ -217,13 +166,6 @@ int main(int argc, char* argv[]) {
 	case SDLK_f:
 	  osd.setTextf("%.1f FPS", 1000.0 / dticks);
 	  break;
-#ifdef DEBUG
-	case SDLK_m:
-	  chooseMacro(world);
-	  paused = 1;
-	  SDL_RenderPresent(renderer);
-	  break;
-#endif
 	case SDLK_r:
 	  //This is just to get a bunch of things on screen to test them
 	  slowmo = false;

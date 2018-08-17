@@ -1,4 +1,4 @@
-CFLAGS = -g -O3 -Wno-unused-result -DDEBUG
+CFLAGS = -g -O3 -Wno-unused-result
 CXXFLAGS = $(CFLAGS) -I/usr/local/opt/flex/include --std=c++11
 
 LIBS = -L/usr/local/opt/flex/lib -g `sdl2-config --libs` -lfl
