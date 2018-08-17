@@ -6,7 +6,6 @@
 class World {
 protected:
   void react(int r0, int c0, int r1, int c1);
-  void decompress(int r, int c);
   void swap(int r0, int c0, int r1, int c1);
 
   void applyReaction(int rstart, int rend);
@@ -20,7 +19,6 @@ public:
   ElementID border;
   int nr, nc;
   ElementID *state, *buffer;
-  float *pressure, *pbuffer;
   bool* changes;
 
   bool multiThreaded = false;
@@ -28,22 +26,21 @@ public:
   World(ElementTable* table, int nr, int nc);
   World(const World& world);
   ~World();
-  
+
   World& operator=(const World& world);
 
   bool changed(int r, int c) const;
   ElementID at(int r, int c) const;
   void set(int r, int c, ElementID id);
-  void set(int r, int c, ElementID id, float pressure);
   const Element& elementAt(int r, int c) const;
-  float pressureAt(int r, int c) const;
 
   void clear();
   void clearFloor();
-  
+
   void flipBuffer();
 
   void iterate();
+
 
   void save(const char* fn) const;
   int load(const char* fn); //Returns 0 on successful load
