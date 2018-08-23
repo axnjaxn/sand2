@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
   ElementID mode = table.menu[modeIndex];
   int drawmode = 0;
   SDL_Event event;
-  bool exitflag = 0, paused = 0, floor = 1, modeflag = 0, slowmo = 0;
+  bool exitflag = 0, paused = 0, floor = 1, modeflag = 0, slowmo = 0, showfps = 0;
   int mousedown = 0;
   Uint32 ticks = 0, dticks;
   while (!exitflag) {
@@ -164,7 +164,7 @@ int main(int argc, char* argv[]) {
 	  else osd.setText("Bottom boundary off");
 	  break;
 	case SDLK_f:
-	  osd.setTextf("%.1f FPS", 1000.0 / dticks);
+	  showfps = !showfps;
 	  break;
 	case SDLK_r:
 	  //This is just to get a bunch of things on screen to test them
@@ -216,6 +216,8 @@ int main(int argc, char* argv[]) {
 	}
       }
     }
+
+    if (showfps) osd.setTextf("%.1f FPS", 1000.0 / dticks);
 
     dticks = SDL_GetTicks() - ticks;
     ticks += dticks;
