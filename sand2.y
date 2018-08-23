@@ -19,7 +19,7 @@ Sand2Spec* gspec = NULL;
 
 %token <str> IDENT
 %token <f> NUMBER
-%token MENU ELEMENT DENSITY PRESSURE REACT DECAY COLOR COMMA LPAREN RPAREN COLON
+%token MENU ELEMENT DENSITY REACT DECAY COLOR COMMA LPAREN RPAREN COLON
 
 %type <s2spec> spec
 %type <s2list> menu_defs element_defs
@@ -40,7 +40,6 @@ element_defs:	{$$ = NULL;}
 properties:	{$$ = defaultPropertyTable();}
 	|	COLOR NUMBER COMMA NUMBER COMMA NUMBER properties {$$ = $7; $$->argb = toARGB($2, $4, $6);}
 	|	DENSITY NUMBER properties {$$ = $3; $$->density = $2; $$->fixed = 0;}
-	|	PRESSURE NUMBER properties {$$ = $3; /*deprecated*/}
 	|	REACT IDENT COLON ptable properties {$$ = $5; $$->reactions = addList($2, $4, $$->reactions);}
 	| 	DECAY ptable properties {$$ = $3; if ($$->decay) yyerror("Multiple decays declared for element."); $$->decay = $2;}
 

@@ -18,7 +18,6 @@ int yyerror(const char*);
 "menu" return MENU;
 "element" return ELEMENT;
 "density" return DENSITY;
-"pressure" return PRESSURE;
 "color" return COLOR;
 "react" return REACT;
 "decay" return DECAY;
