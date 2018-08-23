@@ -111,7 +111,7 @@ int main(int argc, char* argv[]) {
    * Set up draw tools and begin main loop
    */
 
-  int radius = 3, mx, my, nx, ny;
+  int radius = 5, mx, my, nx, ny;
   int modeIndex = (table.menu.size() > 2)? 2 : table.menu.size() - 1;
   ElementID mode = table.menu[modeIndex];
   int drawmode = 0;
