@@ -4,15 +4,17 @@
 #include <cstdlib>
 #include <cmath>
 
-void World::react(int r0, int c0, int r1, int c1) {
+bool World::react(int r0, int c0, int r1, int c1) {
   ElementID result = elementAt(r0, c0).reactions[at(r1, c1)].random();
-  if (result != ProbList::none) set(r0, c0, result);
+  bool ret = (result != ProbList::none);
+  if (ret) set(r0, c0, result);
+  return ret;
 }
 
 void World::swap(int r0, int c0, int r1, int c1) {
-  ElementID t = at(r0, c0);
-  set(r0, c0, at(r1, c1));
-  set(r1, c1, t);
+  buffer[r0 * nc + c0] = state[r1 * nc + c1];
+  buffer[r1 * nc + c1] = state[r0 * nc + c0];
+  changes[r0 * nc + c0] = changes[r1 * nc + c1] = true;
 }
 
 World::World(ElementTable* table, int nr, int nc) {
@@ -94,24 +96,23 @@ void World::flipBuffer() {
 void World::applyReaction(int rstart, int rend) {
   for (int r = rstart; r < rend; r++)
     for (int c = 0; c < nc; c++) {
-      if (changed(r, c)) continue;
-      else {
-	react(r, c, r + 1, c);
-	if (changed(r, c)) continue;
-	react(r, c, r - 1, c);
-	if (changed(r, c)) continue;
-	react(r, c, r, c - 1);
-	if (changed(r, c)) continue;
-	react(r, c, r, c + 1);
-	if (changed(r, c)) continue;
-	react(r, c, r + 1, c - 1);
-	if (changed(r, c)) continue;
-	react(r, c, r + 1, c + 1);
-	if (changed(r, c)) continue;
-	react(r, c, r - 1, c - 1);
-	if (changed(r, c)) continue;
+#ifndef NO_DIAGONAL
+      changed(r, c) ||
+	react(r, c, r + 1, c) ||
+	react(r, c, r - 1, c) ||
+	react(r, c, r, c - 1) ||
+	react(r, c, r, c + 1) ||
+	react(r, c, r + 1, c - 1) ||
+	react(r, c, r + 1, c + 1) ||
+	react(r, c, r - 1, c - 1) ||
 	react(r, c, r - 1, c + 1);
-      }
+#else
+      changed(r, c) ||
+	react(r, c, r + 1, c) ||
+	react(r, c, r - 1, c) ||
+	react(r, c, r, c - 1) ||
+	react(r, c, r, c + 1);
+#endif
     }
 }
 
@@ -137,12 +138,9 @@ void World::applyDecay(int rstart, int rend) {
   ElementID result;
   for (int r = rstart; r < rend; r++)
     for (int c = 0; c < nc; c++) {
-      if (changed(r, c)) continue;
       result = elementAt(r, c).decay.random();
-      if (result != ProbList::none) set(r, c, result);
+      if (result != ProbList::none) buffer[r * nc + c] = result;
     }
-
-  flipBuffer();
 }
 
 void World::applyDecay() {
@@ -174,10 +172,12 @@ void World::applyShift() {
   auto tfn = [this, pshift](int r0, int r1) {
     for (int r = r0; r < r1; r++)
       for (int c = 0; c < nc - 1; c++) {
-	if (changed(r, c) || elementAt(r, c).fixed || changed(r, c + 1) || elementAt(r, c + 1).fixed)
+	if (elementAt(r, c).fixed || elementAt(r, c + 1).fixed)
 	  continue;
-	else if (uniform() < pshift)
+	else if (uniform() < pshift) {
 	  swap(r, c, r, c + 1);
+	  c++;
+	}
       }
   };
 
@@ -195,13 +195,16 @@ void World::applyShift() {
   int colsPerThread = (int)ceil((float)nc / nthreads);
 
   auto tfn2 = [this, pshift](int c0, int c1) {
+    float d, d1;
     for (int r = 0; r < nr - 1; r++)
       for (int c = c0; c < c1; c++) {
-	if (changed(r, c) || elementAt(r, c).fixed || changed(r + 1, c) || elementAt(r + 1, c).fixed)
+	if (changed(r, c) || elementAt(r, c).fixed || elementAt(r + 1, c).fixed)
 	  continue;
-	else if (elementAt(r, c).density > elementAt(r + 1, c).density)
+	d = elementAt(r, c).density;
+	d1 = elementAt(r + 1, c).density;
+	if (d > d1)
 	  swap(r, c, r + 1, c);
-	else if (elementAt(r, c).density == elementAt(r + 1, c).density && uniform() < pshift)
+	else if (d == d1 && uniform() < pshift)
 	  swap(r, c, r + 1, c);
       }
   };
