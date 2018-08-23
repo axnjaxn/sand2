@@ -93,11 +93,15 @@ void World::flipBuffer() {
   memset(changes, 0, sizeof(bool) * nr * nc);
 }
 
-void World::applyReaction(int rstart, int rend) {
-  for (int r = rstart; r < rend; r++)
-    for (int c = 0; c < nc; c++) {
+void World::applyReaction() {
+  int nthreads = multiThreaded? std::thread::hardware_concurrency() : 1;
+  int rowsPerThread = (int)ceil((float)nr / nthreads);
+
+  auto react_fn = [this](int r0, int r1) {
+    for (int r = r0; r < r1; r++)
+      for (int c = 0; c < nc; c++) {
 #ifndef NO_DIAGONAL
-      changed(r, c) ||
+	changed(r, c) ||
 	react(r, c, r + 1, c) ||
 	react(r, c, r - 1, c) ||
 	react(r, c, r, c - 1) ||
@@ -107,26 +111,20 @@ void World::applyReaction(int rstart, int rend) {
 	react(r, c, r - 1, c - 1) ||
 	react(r, c, r - 1, c + 1);
 #else
-      changed(r, c) ||
+	changed(r, c) ||
 	react(r, c, r + 1, c) ||
 	react(r, c, r - 1, c) ||
 	react(r, c, r, c - 1) ||
 	react(r, c, r, c + 1);
 #endif
-    }
-}
-
-void World::applyReaction() {
-  int nthreads = multiThreaded? std::thread::hardware_concurrency() : 1;
-  int rowsPerThread = (int)ceil((float)nr / nthreads);
-
-  auto tfn = [this](int r0, int r1) {this->applyReaction(r0, r1);};
+      }
+  };
 
   std::vector<std::thread> T;
   for (int i = 0, r0 = 0, r1; i < nthreads; i++) {
     r1 = r0 + rowsPerThread;
     if (r1 > nr) r1 = nr;
-    T.push_back(std::thread(tfn, r0, r1));
+    T.push_back(std::thread(react_fn, r0, r1));
     r0 = r1;
   }
 
@@ -134,26 +132,24 @@ void World::applyReaction() {
   flipBuffer();
 }
 
-void World::applyDecay(int rstart, int rend) {
-  ElementID result;
-  for (int r = rstart; r < rend; r++)
-    for (int c = 0; c < nc; c++) {
-      result = elementAt(r, c).decay.random();
-      if (result != ProbList::none) buffer[r * nc + c] = result;
-    }
-}
-
 void World::applyDecay() {
   int nthreads = multiThreaded? std::thread::hardware_concurrency() : 1;
   int rowsPerThread = (int)ceil((float)nr / nthreads);
 
-  auto tfn = [this](int r0, int r1) {this->applyDecay(r0, r1);};
+  auto decay_fn = [this](int r0, int r1) {
+    ElementID result;
+    for (int r = r0; r < r1; r++)
+      for (int c = 0; c < nc; c++) {
+	result = elementAt(r, c).decay.random();
+	if (result != ProbList::none) buffer[r * nc + c] = result;
+      }
+  };
 
   std::vector<std::thread> T;
   for (int i = 0, r0 = 0, r1; i < nthreads; i++) {
     r1 = r0 + rowsPerThread;
     if (r1 > nr) r1 = nr;
-    T.push_back(std::thread(tfn, r0, r1));
+    T.push_back(std::thread(decay_fn, r0, r1));
     r0 = r1;
   }
 
@@ -169,7 +165,7 @@ void World::applyShift() {
   int nthreads = multiThreaded? std::thread::hardware_concurrency() : 1;
   int rowsPerThread = (int)ceil((float)nr / nthreads);
 
-  auto tfn = [this, pshift](int r0, int r1) {
+  auto hshift_fn = [this, pshift](int r0, int r1) {
     for (int r = r0; r < r1; r++)
       for (int c = 0; c < nc - 1; c++) {
 	if (elementAt(r, c).fixed || elementAt(r, c + 1).fixed)
@@ -185,7 +181,7 @@ void World::applyShift() {
   for (int i = 0, r0 = 0, r1; i < nthreads; i++) {
     r1 = r0 + rowsPerThread;
     if (r1 > nr) r1 = nr;
-    T.push_back(std::thread(tfn, r0, r1));
+    T.push_back(std::thread(hshift_fn, r0, r1));
     r0 = r1;
   }
 
@@ -194,7 +190,7 @@ void World::applyShift() {
 
   int colsPerThread = (int)ceil((float)nc / nthreads);
 
-  auto tfn2 = [this, pshift](int c0, int c1) {
+  auto vshift_fn = [this, pshift](int c0, int c1) {
     float d, d1;
     for (int r = 0; r < nr - 1; r++)
       for (int c = c0; c < c1; c++) {
@@ -213,7 +209,7 @@ void World::applyShift() {
   for (int i = 0, c0 = 0, c1; i < nthreads; i++) {
     c1 = c0 + colsPerThread;
     if (c1 > nc) c1 = nc;
-    T.push_back(std::thread(tfn2, c0, c1));
+    T.push_back(std::thread(vshift_fn, c0, c1));
     c0 = c1;
   }
 
