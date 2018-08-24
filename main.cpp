@@ -117,8 +117,9 @@ int main(int argc, char* argv[]) {
   int drawmode = 0;
   SDL_Event event;
   bool exitflag = 0, paused = 0, floor = 1, modeflag = 0, slowmo = 0, showfps = 0;
-  int mousedown = 0;
-  Uint32 ticks = 0, dticks;
+  int mousedown = 0, downframes = 0;
+  const int frames_to_count = 10;
+  Uint32 ticks = 0, dticks, frameticks;
   while (!exitflag) {
     while (SDL_PollEvent(&event)) {
       if (event.type == SDL_QUIT) exitflag = 1;
@@ -165,6 +166,8 @@ int main(int argc, char* argv[]) {
 	  break;
 	case SDLK_f:
 	  showfps = !showfps;
+	  if (showfps) downframes = 0;
+	  frameticks = ticks;
 	  break;
 	case SDLK_r:
 	  //This is just to get a bunch of things on screen to test them
@@ -217,10 +220,18 @@ int main(int argc, char* argv[]) {
       }
     }
 
-    if (showfps) osd.setTextf("%.1f FPS", 1000.0 / dticks);
-
     dticks = SDL_GetTicks() - ticks;
     ticks += dticks;
+
+    if (showfps) {
+      if (downframes == 0) {
+	frameticks = ticks - frameticks;
+	osd.setTextf("%.1f FPS", frames_to_count * 1000.0 / frameticks);
+	frameticks = ticks;
+	downframes = frames_to_count;
+      }
+      downframes--;
+    }
 
     if (modeflag) {
       modeflag = 0;
