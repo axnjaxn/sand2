@@ -4,13 +4,6 @@
 #include <cstdlib>
 #include <cmath>
 
-bool World::react(int r0, int c0, int r1, int c1) {
-  ElementID result = elementAt(r0, c0).reactions[at(r1, c1)].random();
-  bool ret = (result != ProbList::none);
-  if (ret) set(r0, c0, result);
-  return ret;
-}
-
 void World::swap(int r0, int c0, int r1, int c1) {
   buffer[r0 * nc + c0] = state[r1 * nc + c1];
   buffer[r1 * nc + c1] = state[r0 * nc + c0];
@@ -98,25 +91,20 @@ void World::applyReaction() {
   int rowsPerThread = (int)ceil((float)nr / nthreads);
 
   auto react_fn = [this](int r0, int r1) {
+    ElementID res;
     for (int r = r0; r < r1; r++)
       for (int c = 0; c < nc; c++) {
-#ifndef NO_DIAGONAL
-	changed(r, c) ||
-	react(r, c, r + 1, c) ||
-	react(r, c, r - 1, c) ||
-	react(r, c, r, c - 1) ||
-	react(r, c, r, c + 1) ||
-	react(r, c, r + 1, c - 1) ||
-	react(r, c, r + 1, c + 1) ||
-	react(r, c, r - 1, c - 1) ||
-	react(r, c, r - 1, c + 1);
-#else
-	changed(r, c) ||
-	react(r, c, r + 1, c) ||
-	react(r, c, r - 1, c) ||
-	react(r, c, r, c - 1) ||
-	react(r, c, r, c + 1);
-#endif
+	if (changed(r, c)) continue;
+
+	const ReactionList& reactions = elementAt(r, c).reactions;
+	if ((res = reactions[at(r + 1, c)].random()) != ProbList::none
+	    || (res = reactions[at(r - 1, c)].random()) != ProbList::none
+	    || (res = reactions[at(r, c - 1)].random()) != ProbList::none
+	    || (res = reactions[at(r, c + 1)].random()) != ProbList::none
+	    || (res = reactions[at(r + 1, c - 1)].random()) != ProbList::none
+	    || (res = reactions[at(r + 1, c + 1)].random()) != ProbList::none
+	    || (res = reactions[at(r - 1, c - 1)].random()) != ProbList::none
+	    || (res = reactions[at(r - 1, c + 1)].random()) != ProbList::none) set(r, c, res);
       }
   };
 

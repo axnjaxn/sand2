@@ -5,7 +5,6 @@
 
 class World {
 protected:
-  bool react(int r0, int c0, int r1, int c1);
   void swap(int r0, int c0, int r1, int c1);
 
   void applyReaction();
